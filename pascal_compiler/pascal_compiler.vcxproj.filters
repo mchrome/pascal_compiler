@@ -66,6 +66,9 @@
     <ClInclude Include="src\Utils\ckeyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Syntax\CSyntax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="tests\gcd.pas" />

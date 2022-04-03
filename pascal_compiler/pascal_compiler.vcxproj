@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="src\IO\cinputoutput.h" />
     <ClInclude Include="src\Lexer\clexer.h" />
+    <ClInclude Include="src\Syntax\CSyntax.h" />
     <ClInclude Include="src\Utils\ckeyword.h" />
     <ClInclude Include="src\Utils\ctoken.h" />
     <ClInclude Include="src\Utils\cerror.h" />
