@@ -142,6 +142,7 @@
     <ClCompile Include="src\IO\cinputoutput.cpp" />
     <ClCompile Include="src\Lexer\clexer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Syntax\csyntax.cpp" />
     <ClCompile Include="src\Utils\cerror.cpp" />
     <ClCompile Include="src\Utils\ckeyword.cpp" />
     <ClCompile Include="src\Utils\cliteral.cpp" />
@@ -155,7 +156,7 @@
   <ItemGroup>
     <ClInclude Include="src\IO\cinputoutput.h" />
     <ClInclude Include="src\Lexer\clexer.h" />
-    <ClInclude Include="src\Syntax\CSyntax.h" />
+    <ClInclude Include="src\Syntax\csyntax.h" />
     <ClInclude Include="src\Utils\ckeyword.h" />
     <ClInclude Include="src\Utils\ctoken.h" />
     <ClInclude Include="src\Utils\cerror.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="src\Utils\cvariant.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="docs\bnf.txt" />
     <Text Include="tests\gcd.pas" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

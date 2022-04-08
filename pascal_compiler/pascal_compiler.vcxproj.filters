@@ -39,6 +39,9 @@
     <ClCompile Include="src\Utils\ckeyword.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Syntax\csyntax.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="tests\hello.pas" />
@@ -66,11 +69,12 @@
     <ClInclude Include="src\Utils\ckeyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Syntax\CSyntax.h">
+    <ClInclude Include="src\Syntax\csyntax.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="tests\gcd.pas" />
+    <Text Include="docs\bnf.txt" />
   </ItemGroup>
 </Project>
