@@ -28,3 +28,14 @@ std::string CErrorSyntaxExpected::toString()
 {
 	return "\"" + this->expected + "\" was expected, but received" + this->token->toString() + "instead.";
 }
+
+void CErrorSyntaxExpected::StdOutput()
+{
+	std::cout << this->toString() << std::endl;
+}
+
+void CErrorSyntaxExpected::FileOutput(std::string filePath)
+{
+	std::ofstream fout(filePath);
+	fout << this->toString() << std::endl;
+}

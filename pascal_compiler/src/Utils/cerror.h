@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <iostream>
+#include <fstream>
 #include "ctoken.h"
 #define PURE = 0
 
@@ -12,6 +14,8 @@ public:
 	int GetErrorPos();
 	CError(int _errorLine, int _errorPos);
 	virtual std::string toString() PURE;
+	virtual void StdOutput() PURE;
+	virtual void FileOutput(std::string filePath) PURE;
 };
 
 class CErrorSyntaxExpected : public CError {
@@ -21,4 +25,6 @@ private:
 public:
 	CErrorSyntaxExpected(CToken* _received, std::string _expected);
 	std::string toString() override;
+	void StdOutput() override;
+	void FileOutput(std::string filePath) override;
 };
