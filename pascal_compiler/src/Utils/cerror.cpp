@@ -10,14 +10,16 @@ int CError::GetErrorPos()
 	return this->errorPos;
 }
 
-std::string CError::GetErrorMessage()
-{
-	return this->errorMessage;
-}
 
-CError::CError(std::string message, int _errorLine, int _errorPos)
+CError::CError(int _errorLine, int _errorPos)
 {
-	this->errorMessage = message;
 	this->errorLine = _errorLine;
 	this->errorPos = _errorPos;
+}
+
+CErrorSyntaxExpected::CErrorSyntaxExpected(CToken* _received, std::string _expected)
+	: CError(_received->getLineNumber(), _received->getLinePosition())
+{
+	this->token.reset(_received);
+	this->expected = _expected;
 }
