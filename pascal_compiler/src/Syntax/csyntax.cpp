@@ -1,15 +1,16 @@
 #include "CSyntax.h"
+#include "../Utils/cerror.h"
 
 void CSyntax::Program() {
 	this->GetNextToken();
 	this->Identifier();
 	if (curToken->toString() != ";") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 	}
 	this->GetNextToken();
 	this->Block();
 	if (curToken->toString() != ".") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ".").StdOutput();
 	}
 }
 
@@ -31,7 +32,7 @@ void CSyntax::TypeDeclarationPart() {
 	while (curToken->getType() == CTokenType::ttIdentifier) {
 		this->TypeDeclaration();
 		if (this->curToken->toString() != ";") {
-			// TODO: Expected error
+			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 		}
 		this->GetNextToken();
 	}
@@ -41,7 +42,7 @@ void CSyntax::TypeDeclaration() {
 	this->Identifier();
 	this->GetNextToken();
 	if (curToken->toString() != "=") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "=").StdOutput();
 	}
 	this->GetNextToken();
 	this->Type();
@@ -75,7 +76,7 @@ void CSyntax::VarDeclarationPart() {
 	while (curToken->getType() == CTokenType::ttIdentifier) {
 		this->VarDeclaration();
 		if (this->curToken->toString() != ";") {
-			// TODO: Expected error
+			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 		}
 		this->GetNextToken();
 	}
@@ -90,7 +91,7 @@ void CSyntax::VarDeclaration() {
 		this->GetNextToken();
 	}
 	if (curToken->toString() != ":") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
 	}
 	this->GetNextToken();
 	this->Type();
@@ -100,7 +101,7 @@ void CSyntax::FuncionDeclarationPart() {
 	while (this->curToken->toString() == "function") {
 		this->FuncionDeclaration();
 		if (this->curToken->toString() != ";") {
-			// TODO: Expected error
+			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 		}
 		this->GetNextToken();
 	}
@@ -124,16 +125,16 @@ void CSyntax::FunctionHeading() {
 	}
 
 	if (curToken->toString() != ")") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
 	}
 
 	if (curToken->toString() != ":") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
 	}
 	this->GetNextToken();
 	this->Type();
 	if (this->curToken->toString() != ";") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 	}
 }
 
@@ -158,7 +159,7 @@ void CSyntax::ParameterGroup() {
 	}
 
 	if (curToken->toString() != ":") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
 	}
 
 	this->GetNextToken();
@@ -168,12 +169,12 @@ void CSyntax::ParameterGroup() {
 
 void CSyntax::StatementPart() {
 	if (curToken->toString() != "begin") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "begin").StdOutput();
 	}
 	this->GetNextToken();
 	this->CompoundStatement();
 	if (curToken->toString() != "end") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "end").StdOutput();
 	}
 	this->GetNextToken();
 }
@@ -220,7 +221,7 @@ void CSyntax::AssignmentStatement() {
 		this->Variable();
 	}
 	if (curToken->toString() != ":=") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ":=").StdOutput();
 	}
 	this->GetNextToken();
 	this->Expression();
@@ -295,7 +296,7 @@ void CSyntax::Factor() {
 		this->GetNextToken();
 		this->Expression();
 		if (curToken->toString() != ")") {
-			// TODO: Expected error
+			CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
 		}
 		this->GetNextToken();
 	}
@@ -340,7 +341,7 @@ void CSyntax::FunctionDesignator() {
 		this->ActualParameter();
 	}
 	if (curToken->toString() != ")") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
 	}
 	this->GetNextToken();
 }
@@ -357,7 +358,7 @@ void CSyntax::ProcedureStatement() {
 		this->ActualParameter();
 	}
 	if (curToken->toString() != ")") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
 	}
 	this->GetNextToken();
 }
@@ -380,7 +381,7 @@ void CSyntax::IfStatement() {
 	this->GetNextToken();
 	this->Expression();
 	if (curToken->toString() != "then") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "then").StdOutput();
 	}
 	this->GetNextToken();
 	this->Statement();
@@ -394,7 +395,7 @@ void CSyntax::WhileStatement() {
 	this->GetNextToken();
 	this->Expression();
 	if (curToken->toString() != "do") {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "do").StdOutput();
 	}
 	this->GetNextToken();
 	this->Statement();
@@ -402,7 +403,7 @@ void CSyntax::WhileStatement() {
 
 void CSyntax::Identifier() {
 	if (this->curToken->getType() != CTokenType::ttIdentifier) {
-		// TODO: Expected error
+		CErrorSyntaxExpected(curToken.release(), "An identifier").StdOutput();
 	}
 	this->GetNextToken();
 }
@@ -426,7 +427,7 @@ void CSyntax::Run()
 	else {
 		this->Block();
 		if (curToken->toString() != ".") {
-			// TODO: Expected "." keyword error
+			CErrorSyntaxExpected(curToken.release(), ".").StdOutput();
 		}
 	}
 }
