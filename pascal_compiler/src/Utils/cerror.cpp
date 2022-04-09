@@ -26,7 +26,8 @@ CErrorSyntaxExpected::CErrorSyntaxExpected(CToken* _received, std::string _expec
 
 std::string CErrorSyntaxExpected::toString()
 {
-	return "\"" + this->expected + "\" was expected, but received" + this->token->toString() + "instead.";
+	return "CSyntax [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] " +
+		"\"" + this->expected + "\" was expected, but received " + this->token->toString() + " instead.";
 }
 
 void CErrorSyntaxExpected::StdOutput()
