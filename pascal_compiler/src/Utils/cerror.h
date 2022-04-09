@@ -2,8 +2,13 @@
 #include <string>
 
 class CError {
-public:
+private:
 	int errorLine;
+	int errorPos;
 	std::string errorMessage;
-	CError(int line, std::string message);
+public:
+	int GetErrorLine();
+	int GetErrorPos();
+	std::string GetErrorMessage();
+	CError(std::string message, int _errorLine, int _errorPos);
 };

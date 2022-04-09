@@ -39,7 +39,6 @@ private:
 	void FunctionDesignator();
 	void ProcedureStatement();
 	void ActualParameter();
-	void Empty();
 	void StructuredStatement();
 	void IfStatement();
 	void WhileStatement();
