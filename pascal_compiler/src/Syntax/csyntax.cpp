@@ -66,30 +66,103 @@ void CSyntax::PointerType() {
 }
 
 void CSyntax::VarDeclarationPart() {
+	// Check if var declaration part is empty, if so exit
+	if (this->curToken->toString() != "var") return;
 
+	this->GetNextToken();
+
+	// Check all var declarations
+	while (curToken->getType() == CTokenType::ttIdentifier) {
+		this->VarDeclaration();
+		if (this->curToken->toString() != ";") {
+			// TODO: Expected error
+		}
+		this->GetNextToken();
+	}
 }
 
 void CSyntax::VarDeclaration() {
-
+	this->Identifier();
+	this->GetNextToken();
+	while (curToken->toString() == ",") {
+		this->GetNextToken();
+		this->Identifier();
+		this->GetNextToken();
+	}
+	if (curToken->toString() != ":") {
+		// TODO: Expected error
+	}
+	this->GetNextToken();
+	this->Type();
 }
 
 void CSyntax::FuncionDeclarationPart() {
-
+	while (this->curToken->toString() == "function") {
+		this->FuncionDeclaration();
+		if (this->curToken->toString() != ";") {
+			// TODO: Expected error
+		}
+		this->GetNextToken();
+	}
 }
 
 void CSyntax::FuncionDeclaration() {
-
+	this->FunctionHeading();
+	this->Block();
 }
 
 void CSyntax::FunctionHeading() {
+	this->GetNextToken();
+	this->Identifier();
 
+	if (curToken->toString() == "(") {
+		this->FormalParameterSection();
+		while (curToken->toString() == ";") {
+			this->GetNextToken();
+			this->FormalParameterSection();
+		}
+	}
+
+	if (curToken->toString() != ")") {
+		// TODO: Expected error
+	}
+
+	if (curToken->toString() != ":") {
+		// TODO: Expected error
+	}
+	this->GetNextToken();
+	this->Type();
+	if (this->curToken->toString() != ";") {
+		// TODO: Expected error
+	}
 }
 
 void CSyntax::FormalParameterSection() {
 
+	if (curToken->getType() == CTokenType::ttIdentifier) {
+		this->ParameterGroup();
+	}
+
+	if (curToken->toString() == "var") {
+		this->GetNextToken();
+		this->ParameterGroup();
+	}
+
 }
 
 void CSyntax::ParameterGroup() {
+	this->Identifier();
+	while (curToken->toString() == ",") {
+		this->GetNextToken();
+		this->Identifier();
+	}
+
+	if (curToken->toString() != ":") {
+		// TODO: Expected error
+	}
+
+	this->GetNextToken();
+	this->Type();
 
 }
 
@@ -186,7 +259,10 @@ void CSyntax::WhileStatement() {
 }
 
 void CSyntax::Identifier() {
-
+	if (this->curToken->getType() != CTokenType::ttIdentifier) {
+		// TODO: Expected error
+	}
+	this->GetNextToken();
 }
 
 void CSyntax::GetNextToken()
