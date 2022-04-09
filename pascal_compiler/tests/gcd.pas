@@ -18,7 +18,7 @@ inpt:string;
 
 function GCD(m,n:integer):integer;
 	begin
-		while m<>n do .
+		while m<>n do
 		if m>n then m:=m-n else n:=n-m;
 		GCD:=m;
 	end;

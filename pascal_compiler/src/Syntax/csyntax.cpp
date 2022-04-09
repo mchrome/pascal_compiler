@@ -40,7 +40,6 @@ void CSyntax::TypeDeclarationPart() {
 
 void CSyntax::TypeDeclaration() {
 	this->Identifier();
-	this->GetNextToken();
 	if (curToken->toString() != "=") {
 		CErrorSyntaxExpected(curToken.release(), "=").StdOutput();
 	}
@@ -56,9 +55,6 @@ void CSyntax::Type() {
 	else {
 		this->PointerType();
 	}
-	
-	this->GetNextToken();
-	
 }
 
 void CSyntax::PointerType() {
@@ -84,11 +80,9 @@ void CSyntax::VarDeclarationPart() {
 
 void CSyntax::VarDeclaration() {
 	this->Identifier();
-	this->GetNextToken();
 	while (curToken->toString() == ",") {
 		this->GetNextToken();
 		this->Identifier();
-		this->GetNextToken();
 	}
 	if (curToken->toString() != ":") {
 		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
@@ -117,6 +111,7 @@ void CSyntax::FunctionHeading() {
 	this->Identifier();
 
 	if (curToken->toString() == "(") {
+		this->GetNextToken();
 		this->FormalParameterSection();
 		while (curToken->toString() == ";") {
 			this->GetNextToken();
@@ -128,6 +123,8 @@ void CSyntax::FunctionHeading() {
 		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
 	}
 
+	this->GetNextToken();
+
 	if (curToken->toString() != ":") {
 		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
 	}
@@ -136,6 +133,7 @@ void CSyntax::FunctionHeading() {
 	if (this->curToken->toString() != ";") {
 		CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
 	}
+	this->GetNextToken();
 }
 
 void CSyntax::FormalParameterSection() {
@@ -144,7 +142,7 @@ void CSyntax::FormalParameterSection() {
 		this->ParameterGroup();
 	}
 
-	if (curToken->toString() == "var") {
+	else if (curToken->toString() == "var") {
 		this->GetNextToken();
 		this->ParameterGroup();
 	}
@@ -235,7 +233,7 @@ void CSyntax::Variable() {
 
 void CSyntax::Expression() {
 	this->SimpleExpression();
-	if (curToken->toString() == "<" ||
+	while (curToken->toString() == "<" ||
 		curToken->toString() == ">" ||
 		curToken->toString() == ">=" ||
 		curToken->toString() == "<=" ||
@@ -255,7 +253,8 @@ void CSyntax::SimpleExpression() {
 	this->Term();
 	while (curToken->toString() == "+" ||
 		curToken->toString() == "-" ||
-		curToken->toString() == "or") 
+		curToken->toString() == "or" ||
+		curToken->toString() == "xor")
 	{
 		this->AddingOperator();
 		this->Term();
@@ -287,7 +286,8 @@ void CSyntax::Factor() {
 	}
 	else if (curToken->toString() == "+" ||
 		curToken->toString() == "-" ||
-		curToken->toString() == "not") 
+		curToken->toString() == "not" ||
+		curToken->toString() == "@")
 	{
 		this->UnaryOperator();
 		this->Factor();
@@ -383,12 +383,26 @@ void CSyntax::IfStatement() {
 	if (curToken->toString() != "then") {
 		CErrorSyntaxExpected(curToken.release(), "then").StdOutput();
 	}
+
 	this->GetNextToken();
-	this->Statement();
-	if (curToken->toString() == "else") {
-		this->GetNextToken();
+	if (curToken->toString() == "begin") {
+		this->StatementPart();
+	}
+	else {
 		this->Statement();
 	}
+	
+	if (curToken->toString() == "else") {
+		this->GetNextToken();
+
+		if (curToken->toString() == "begin") {
+			this->StatementPart();
+		}
+		else {
+			this->Statement();
+		}
+	}
+
 }
 
 void CSyntax::WhileStatement() {
@@ -398,7 +412,12 @@ void CSyntax::WhileStatement() {
 		CErrorSyntaxExpected(curToken.release(), "do").StdOutput();
 	}
 	this->GetNextToken();
-	this->Statement();
+	if (curToken->toString() == "begin") {
+		this->StatementPart();
+	}
+	else {
+		this->Statement();
+	}
 }
 
 void CSyntax::Identifier() {

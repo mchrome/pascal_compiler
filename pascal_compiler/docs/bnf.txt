@@ -25,17 +25,17 @@ function <identifier>(<formalParameterSection>{;<formalParameterSection>}):<type
 <assignmentStatement> ::= <variable> := <expression>
 <variable> ::= <identifier>{^}
 
-<expression> ::= <simpleExpression>|<simpleExpression> <relationalOperator> <simpleExpression>
+<expression> ::= <simpleExpression>{<relationalOperator><simpleExpression>}
 <relationalOperator> ::= <|>|>=|<=|=|<>
 
 <simpleExpression> ::= <term>{<addingOperator><term>}
-<addingOperator> ::= + | - | or
+<addingOperator> ::= + | - | or | xor
 
 <term> ::= <factor>{<multiplyingOperator><factor>}
 <multiplyingOperator> ::= * | / | and
 
 <factor> ::= <variable> | <unsignedConst> | (<expression>) | <functionDesignator> | <unaryOperator><factor>
-<unaryOperator> ::= + | - | not
+<unaryOperator> ::= + | - | not | @
 
 <unsignedConst> ::= <unsignedNumber> | <stringConst>
 <unsignedNumber> ::= <unsignedInteger> | <unsignedReal>
@@ -53,5 +53,6 @@ function <identifier>(<formalParameterSection>{;<formalParameterSection>}):<type
 <structuredStatement> ::= <ifStatement>|<whileStatement>
 // <structuredStatement> ::= <compoundStatement>|<ifStatement>|<whileStatement>
 
-<ifStatement> ::= if <expression> then <statement>| if<expression> then <statement> else <statement>
-<whileStatement> ::= while <expression> do <statement>
+<ifStatement> ::= if <expression> then <statement> | if <expression> then <statementPart> | if<expression> then <statement> else <statement>
+| if<expression> then <statementPart> else <statementPart> | if<expression> then <statement> else <statementPart> | if<expression> then <statementPart> else <statement>
+<whileStatement> ::= while <expression> do <statement> | while <expression> do <statementPart>
