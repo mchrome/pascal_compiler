@@ -1,4 +1,4 @@
-Program gcd;
+program gcd;
 
 type 
 	Bptr = ^boolean;

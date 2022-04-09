@@ -14,5 +14,4 @@ private:
 public:
 	CInputOutput(std::string filePath, std::string outputPath);
 	std::unique_ptr<CLiteral> NextChar();
-	void WriteError(CError error);
 };

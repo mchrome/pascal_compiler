@@ -20,7 +20,3 @@ std::unique_ptr<CLiteral> CInputOutput::NextChar() {
 
 	return l;
 }
-
-void CInputOutput::WriteError(CError error) {
-	this->outputFileStream << "C" /*ERROR CODE HERE*/ << error.errorLine << ": " << error.errorMessage << std::endl;
-}
