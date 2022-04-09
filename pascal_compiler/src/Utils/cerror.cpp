@@ -23,3 +23,8 @@ CErrorSyntaxExpected::CErrorSyntaxExpected(CToken* _received, std::string _expec
 	this->token.reset(_received);
 	this->expected = _expected;
 }
+
+std::string CErrorSyntaxExpected::toString()
+{
+	return "\"" + this->expected + "\" was expected, but received" + this->token->toString() + "instead.";
+}
