@@ -41,6 +41,11 @@ CTokenIdentifier::CTokenIdentifier(CVariant* _name, int _lineNumber, int _linePo
 
 std::string CTokenIdentifier::toString()
 {
+	return this->name->toString();
+}
+
+std::string CTokenIdentifier::toStringWithType()
+{
 	return this->getTypeAsString() + " " + this->name->toString();
 }
 
@@ -52,6 +57,11 @@ CTokenConst::CTokenConst(CVariant* _value, int _lineNumber, int _linePosition)
 
 std::string CTokenConst::toString()
 {
+	return this->value->toString();
+}
+
+std::string CTokenConst::toStringWithType()
+{
 	return this->getTypeAsString() + " " + this->value->toString();
 }
 
@@ -62,6 +72,11 @@ CTokenKeyword::CTokenKeyword(CKeyword _kword, int _lineNumber, int _linePosition
 }
 
 std::string CTokenKeyword::toString()
+{
+	return c_keywordsToStr.at(kword);
+}
+
+std::string CTokenKeyword::toStringWithType()
 {
 	return this->getTypeAsString() + " " + c_keywordsToStr.at(kword);
 }

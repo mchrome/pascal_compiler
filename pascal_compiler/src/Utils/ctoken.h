@@ -23,6 +23,7 @@ public:
 	int getLineNumber();
 	int getLinePosition();
 	virtual std::string toString() PURE;
+	virtual std::string toStringWithType() PURE;
 };
 
 class CTokenIdentifier : public CToken {
@@ -31,6 +32,7 @@ private:
 public:
 	CTokenIdentifier(CVariant* _name, int _lineNumber, int _linePosition);
 	std::string toString() override;
+	std::string toStringWithType() override;
 };
 
 class CTokenKeyword : public CToken {
@@ -39,6 +41,7 @@ private:
 public:
 	CTokenKeyword(CKeyword _kword, int _lineNumber, int _linePosition);
 	std::string toString() override;
+	std::string toStringWithType() override;
 };
 
 class CTokenConst : public CToken {
@@ -47,4 +50,5 @@ private:
 public:
 	CTokenConst(CVariant* _value, int _lineNumber, int _linePosition);
 	std::string toString() override;
+	std::string toStringWithType() override;
 };
