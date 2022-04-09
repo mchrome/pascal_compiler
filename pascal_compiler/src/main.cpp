@@ -4,6 +4,7 @@
 #include <memory>
 #include "IO/cinputoutput.h"
 #include "Lexer/clexer.h"
+#include "Syntax/csyntax.h"
 
 int main() {
 
@@ -16,11 +17,15 @@ int main() {
 	}*/
 	
 	auto lexer = std::make_unique<CLexer>(m.release());
-	auto token = lexer->NextToken();
+	
+	/*auto token = lexer->NextToken();
 	while (token!=nullptr) {
 		std::cout << token->getLineNumber() << ":" << token->getLinePosition() << " " << token->toString() << std::endl;
 		token.reset(lexer->NextToken().release());
-	}
-	
+	}*/
+
+	auto syntax = std::make_unique<CSyntax>(lexer.release());
+	syntax->Run();
+
 	return 0;
 }
