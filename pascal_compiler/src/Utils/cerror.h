@@ -34,3 +34,8 @@ class CErrorSyntaxExpectedKeyword : public CErrorSyntaxExpected {
 public:
 	CErrorSyntaxExpectedKeyword(CToken* _received, CKeyword _expected);
 };
+
+class CErrorSyntaxExpectedConst : public CErrorSyntaxExpected {
+public:
+	CErrorSyntaxExpectedConst(CToken* _received);
+};

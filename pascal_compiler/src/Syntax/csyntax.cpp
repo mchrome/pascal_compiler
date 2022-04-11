@@ -423,6 +423,14 @@ bool CSyntax::CurTokenIsConst()
 	return dynamic_cast<CTokenConst*>(curToken.get()) != nullptr;
 }
 
+void CSyntax::AcceptConst()
+{
+	if (!this->CurTokenIsConst()) {
+		CErrorSyntaxExpectedConst(curToken.release()).StdOutput();
+	}
+	this->GetNextToken();
+}
+
 
 
 CSyntax::CSyntax(CLexer* _lexer)

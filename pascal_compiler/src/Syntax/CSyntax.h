@@ -54,6 +54,7 @@ private:
 	bool CurTokenIsGivenKeyword(CKeyword kw);
 	bool CurTokenIsNumberConst();
 	bool CurTokenIsConst();
+	void AcceptConst();
 public:
 	CSyntax(CLexer* _lexer);
 	void Run();

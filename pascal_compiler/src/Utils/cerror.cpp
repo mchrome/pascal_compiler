@@ -45,3 +45,8 @@ CErrorSyntaxExpectedKeyword::CErrorSyntaxExpectedKeyword(CToken* _received, CKey
 	CErrorSyntaxExpected(_received, c_keywordsToStr.at(_expected))
 {
 }
+
+CErrorSyntaxExpectedConst::CErrorSyntaxExpectedConst(CToken* _received)
+	: CErrorSyntaxExpected(_received, "A constant")
+{
+}
