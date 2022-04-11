@@ -8,7 +8,7 @@
 
 int main() {
 
-	auto m = std::make_unique<CInputOutput>("C:\\Users\\aaa\\source\\repos\\pascal_compiler\\pascal_compiler\\tests\\gcd.pas", "output.txt");
+	auto m = std::make_unique<CInputOutput>("C:\\Users\\aaa\\source\\repos\\pascal_compiler\\pascal_compiler\\tests\\case.pas", "output.txt");
 	
 	/*auto l = std::move(m->NextChar());
 	while (l->c != EOF) {

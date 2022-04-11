@@ -142,9 +142,10 @@ void CSyntax::Statement() {
 		// Simple statement always starts with an identifier
 		this->SimpleStatement();
 	}
-	else if (this->CurTokenIsGivenKeyword(CKeyword::ifSy) || this->CurTokenIsGivenKeyword(CKeyword::whileSy)) {
+	else if (this->CurTokenIsGivenKeyword(CKeyword::ifSy) 
+		|| this->CurTokenIsGivenKeyword(CKeyword::whileSy)
+		|| this->CurTokenIsGivenKeyword(CKeyword::caseSy)) {
 		// Structured statement always starts with if or while
-		// TODO: case
 		this->StructuredStatement();
 	}
 }
@@ -348,10 +349,28 @@ void CSyntax::WhileStatement() {
 
 void CSyntax::CaseStatement()
 {
+	this->AcceptKeyword(CKeyword::caseSy);
+	this->Expression();
+	this->AcceptKeyword(CKeyword::ofSy);
+	this->CaseListElement();
+	while (this->TryAcceptKeyword(CKeyword::semicolonSy)) {
+		this->CaseListElement();
+	}
+	this->AcceptKeyword(CKeyword::endSy);
 }
 
 void CSyntax::CaseListElement()
 {
+	// Check if CaseListElement is empty, if so exit
+	if (this->CurTokenIsGivenKeyword(CKeyword::endSy)) return;
+
+	this->UnsignedConst();
+	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
+		this->UnsignedConst();
+	}
+	this->AcceptKeyword(CKeyword::colonSy);
+	this->Statement();
+	
 }
 
 void CSyntax::Identifier() {
@@ -397,6 +416,11 @@ bool CSyntax::CurTokenIsNumberConst()
 {
 	CTokenConst* tempDerived = static_cast<CTokenConst*>(curToken.get());
 	return tempDerived->getVariantType() == VariantType::vtInt || tempDerived->getVariantType() == VariantType::vtReal;
+}
+
+bool CSyntax::CurTokenIsConst()
+{
+	return dynamic_cast<CTokenConst*>(curToken.get()) != nullptr;
 }
 
 

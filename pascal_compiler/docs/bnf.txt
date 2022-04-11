@@ -57,4 +57,4 @@ function <identifier>(<formalParameterSection>{;<formalParameterSection>}):<type
 | if<expression> then <statementPart> else <statementPart> | if<expression> then <statement> else <statementPart> | if<expression> then <statementPart> else <statement>
 <whileStatement> ::= while <expression> do <statement> | while <expression> do <statementPart>
 <caseStatement> ::= case <expression> of <case list element> {; <case list element> } end
-<caseListElement> ::= <unsignedConst>{, <unsignedConst> } : <statement>
+<caseListElement> ::= <empty> | <unsignedConst>{, <unsignedConst> } : <statement>

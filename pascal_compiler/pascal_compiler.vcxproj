@@ -150,6 +150,7 @@
     <ClCompile Include="src\Utils\cvariant.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="tests\case.pas" />
     <None Include="tests\dijkstra.pas" />
     <None Include="tests\hello.pas" />
   </ItemGroup>
