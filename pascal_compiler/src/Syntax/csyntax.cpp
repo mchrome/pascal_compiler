@@ -368,7 +368,13 @@ void CSyntax::CaseListElement()
 		this->UnsignedConst();
 	}
 	this->AcceptKeyword(CKeyword::colonSy);
-	this->Statement();
+
+	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
+		this->StatementPart();
+	}
+	else {
+		this->Statement();
+	}
 	
 }
 
