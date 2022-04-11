@@ -55,6 +55,11 @@ CTokenConst::CTokenConst(CVariant* _value, int _lineNumber, int _linePosition)
 	this->value.reset(_value);
 }
 
+VariantType CTokenConst::getVariantType()
+{
+	return this->value->getVariantType();
+}
+
 std::string CTokenConst::toString()
 {
 	return this->value->toString();
@@ -69,6 +74,11 @@ CTokenKeyword::CTokenKeyword(CKeyword _kword, int _lineNumber, int _linePosition
 	: CToken(CTokenType::ttKeyword, _lineNumber, _linePosition)
 {
 	this->kword = _kword;
+}
+
+CKeyword CTokenKeyword::getKeyword()
+{
+	return this->kword;
 }
 
 std::string CTokenKeyword::toString()

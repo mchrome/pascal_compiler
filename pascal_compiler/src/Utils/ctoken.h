@@ -40,6 +40,7 @@ private:
 	CKeyword kword;
 public:
 	CTokenKeyword(CKeyword _kword, int _lineNumber, int _linePosition);
+	CKeyword getKeyword();
 	std::string toString() override;
 	std::string toStringWithType() override;
 };
@@ -49,6 +50,7 @@ private:
 	std::unique_ptr<CVariant> value;
 public:
 	CTokenConst(CVariant* _value, int _lineNumber, int _linePosition);
+	VariantType getVariantType();
 	std::string toString() override;
 	std::string toStringWithType() override;
 };

@@ -1,17 +1,12 @@
 #include "CSyntax.h"
-#include "../Utils/cerror.h"
+
 
 void CSyntax::Program() {
 	this->GetNextToken();
 	this->Identifier();
-	if (curToken->toString() != ";") {
-		CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::semicolonSy);
 	this->Block();
-	if (curToken->toString() != ".") {
-		CErrorSyntaxExpected(curToken.release(), ".").StdOutput();
-	}
+	this->AcceptKeyword(CKeyword::dotSy);
 }
 
 void CSyntax::Block() {
@@ -24,32 +19,24 @@ void CSyntax::Block() {
 void CSyntax::TypeDeclarationPart() {
 	
 	// Check if type declaration part is empty, if so exit
-	if (this->curToken->toString() != "type") return;
-	
-	this->GetNextToken();
+	if (!this->TryAcceptKeyword(CKeyword::typeSy)) return;
 
 	// Check all type declarations
 	while (curToken->getType() == CTokenType::ttIdentifier) {
 		this->TypeDeclaration();
-		if (this->curToken->toString() != ";") {
-			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
-		}
-		this->GetNextToken();
+		this->AcceptKeyword(CKeyword::semicolonSy);
 	}
 }
 
 void CSyntax::TypeDeclaration() {
 	this->Identifier();
-	if (curToken->toString() != "=") {
-		CErrorSyntaxExpected(curToken.release(), "=").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::equalSy);
 	this->Type();
 }
 
 void CSyntax::Type() {
 	
-	if (curToken->toString() != "^") {
+	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
 		this->Identifier();
 	}
 	else {
@@ -64,40 +51,28 @@ void CSyntax::PointerType() {
 
 void CSyntax::VarDeclarationPart() {
 	// Check if var declaration part is empty, if so exit
-	if (this->curToken->toString() != "var") return;
-
-	this->GetNextToken();
+	if (!this->TryAcceptKeyword(CKeyword::varSy)) return;
 
 	// Check all var declarations
 	while (curToken->getType() == CTokenType::ttIdentifier) {
 		this->VarDeclaration();
-		if (this->curToken->toString() != ";") {
-			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
-		}
-		this->GetNextToken();
+		this->AcceptKeyword(CKeyword::semicolonSy);
 	}
 }
 
 void CSyntax::VarDeclaration() {
 	this->Identifier();
-	while (curToken->toString() == ",") {
-		this->GetNextToken();
+	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
 		this->Identifier();
 	}
-	if (curToken->toString() != ":") {
-		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::colonSy);
 	this->Type();
 }
 
 void CSyntax::FuncionDeclarationPart() {
-	while (this->curToken->toString() == "function") {
+	while (this->CurTokenIsGivenKeyword(CKeyword::functionSy)) {
 		this->FuncionDeclaration();
-		if (this->curToken->toString() != ";") {
-			CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
-		}
-		this->GetNextToken();
+		this->AcceptKeyword(CKeyword::semicolonSy);
 	}
 }
 
@@ -110,30 +85,16 @@ void CSyntax::FunctionHeading() {
 	this->GetNextToken();
 	this->Identifier();
 
-	if (curToken->toString() == "(") {
-		this->GetNextToken();
+	if (this->TryAcceptKeyword(CKeyword::leftParSy)) {
 		this->FormalParameterSection();
-		while (curToken->toString() == ";") {
-			this->GetNextToken();
+		while (this->TryAcceptKeyword(CKeyword::semicolonSy)) {
 			this->FormalParameterSection();
 		}
 	}
-
-	if (curToken->toString() != ")") {
-		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
-	}
-
-	this->GetNextToken();
-
-	if (curToken->toString() != ":") {
-		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::rightParSy);
+	this->AcceptKeyword(CKeyword::colonSy);
 	this->Type();
-	if (this->curToken->toString() != ";") {
-		CErrorSyntaxExpected(curToken.release(), ";").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::semicolonSy);
 }
 
 void CSyntax::FormalParameterSection() {
@@ -142,8 +103,7 @@ void CSyntax::FormalParameterSection() {
 		this->ParameterGroup();
 	}
 
-	else if (curToken->toString() == "var") {
-		this->GetNextToken();
+	else if (this->TryAcceptKeyword(CKeyword::varSy)) {
 		this->ParameterGroup();
 	}
 
@@ -151,39 +111,27 @@ void CSyntax::FormalParameterSection() {
 
 void CSyntax::ParameterGroup() {
 	this->Identifier();
-	while (curToken->toString() == ",") {
-		this->GetNextToken();
+	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
 		this->Identifier();
 	}
 
-	if (curToken->toString() != ":") {
-		CErrorSyntaxExpected(curToken.release(), ":").StdOutput();
-	}
-
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::colonSy);
 	this->Type();
 
 }
 
 void CSyntax::StatementPart() {
-	if (curToken->toString() != "begin") {
-		CErrorSyntaxExpected(curToken.release(), "begin").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::beginSy);
 	this->CompoundStatement();
-	if (curToken->toString() != "end") {
-		CErrorSyntaxExpected(curToken.release(), "end").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::endSy);
 }
 
 void CSyntax::CompoundStatement() {
 	// Check if compound statement is empty
-	if (curToken->toString() == "end") return;
+	if (this->CurTokenIsGivenKeyword(CKeyword::endSy)) return;
 	
 	this->Statement();
-	while (curToken->toString() == ";") {
-		this->GetNextToken();
+	while (this->TryAcceptKeyword(CKeyword::semicolonSy)) {
 		this->Statement();
 	}
 
@@ -194,19 +142,20 @@ void CSyntax::Statement() {
 		// Simple statement always starts with an identifier
 		this->SimpleStatement();
 	}
-	else if (curToken->toString() == "if" || curToken->toString() == "while") {
+	else if (this->CurTokenIsGivenKeyword(CKeyword::ifSy) || this->CurTokenIsGivenKeyword(CKeyword::whileSy)) {
 		// Structured statement always starts with if or while
+		// TODO: case
 		this->StructuredStatement();
 	}
 }
 
 void CSyntax::SimpleStatement() {
 	this->Identifier();
-	if (curToken->toString() == "^" || curToken->toString() == ":=")
+	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy) || this->CurTokenIsGivenKeyword(CKeyword::assignSy))
 	{
 		this->AssignmentStatement();
 	}
-	else if (curToken->toString() == "(") {
+	else if (this->CurTokenIsGivenKeyword(CKeyword::leftParSy)) {
 		this->ProcedureStatement();
 	}
 	else {
@@ -215,30 +164,25 @@ void CSyntax::SimpleStatement() {
 }
 
 void CSyntax::AssignmentStatement() {
-	if (curToken->toString() == "^") {
+	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
 		this->Variable();
 	}
-	if (curToken->toString() != ":=") {
-		CErrorSyntaxExpected(curToken.release(), ":=").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::assignSy);
 	this->Expression();
 }
 
 void CSyntax::Variable() {
-	while (curToken->toString() == "^") {
-		this->GetNextToken();
-	}
+	while (this->TryAcceptKeyword(CKeyword::pointerSy)) {}
 }
 
 void CSyntax::Expression() {
 	this->SimpleExpression();
-	while (curToken->toString() == "<" ||
-		curToken->toString() == ">" ||
-		curToken->toString() == ">=" ||
-		curToken->toString() == "<=" ||
-		curToken->toString() == "=" ||
-		curToken->toString() == "<>")
+	while (this->CurTokenIsGivenKeyword(CKeyword::lessSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::greaterSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::greaterEqualSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::lessEqualSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::equalSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::notEqualSy))
 	{
 		this->RelationalOperator();
 		this->SimpleExpression();
@@ -251,10 +195,10 @@ void CSyntax::RelationalOperator() {
 
 void CSyntax::SimpleExpression() {
 	this->Term();
-	while (curToken->toString() == "+" ||
-		curToken->toString() == "-" ||
-		curToken->toString() == "or" ||
-		curToken->toString() == "xor")
+	while (this->CurTokenIsGivenKeyword(CKeyword::plusSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::minusSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::orSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::xorSy))
 	{
 		this->AddingOperator();
 		this->Term();
@@ -267,9 +211,9 @@ void CSyntax::AddingOperator() {
 
 void CSyntax::Term() {
 	this->Factor();
-	while (curToken->toString() == "*" ||
-		curToken->toString() == "/" ||
-		curToken->toString() == "and")
+	while (this->CurTokenIsGivenKeyword(CKeyword::multiplySy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::divisionSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::andSy))
 	{
 		this->MultiplyingOperator();
 		this->Factor();
@@ -284,28 +228,24 @@ void CSyntax::Factor() {
 	if (curToken->getType() == CTokenType::ttConst) {
 		this->UnsignedConst();
 	}
-	else if (curToken->toString() == "+" ||
-		curToken->toString() == "-" ||
-		curToken->toString() == "not" ||
-		curToken->toString() == "@")
+	else if (this->CurTokenIsGivenKeyword(CKeyword::plusSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::minusSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::notSy) ||
+		this->CurTokenIsGivenKeyword(CKeyword::addressSy))
 	{
 		this->UnaryOperator();
 		this->Factor();
 	}
-	else if (curToken->toString() == "(") {
-		this->GetNextToken();
+	else if (this->TryAcceptKeyword(CKeyword::leftParSy)) {
 		this->Expression();
-		if (curToken->toString() != ")") {
-			CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
-		}
-		this->GetNextToken();
+		this->AcceptKeyword(CKeyword::rightParSy);
 	}
 	else if (curToken->getType() == CTokenType::ttIdentifier) {
 		this->Identifier();
-		if (curToken->toString() == "^") {
+		if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
 			this->Variable();
 		}
-		else if (curToken->toString() == "(") {
+		else if (this->CurTokenIsGivenKeyword(CKeyword::leftParSy)) {
 			this->FunctionDesignator();
 		}
 	}
@@ -316,11 +256,12 @@ void CSyntax::UnaryOperator() {
 }
 
 void CSyntax::UnsignedConst() {
-	if (curToken->toString()[0] >= '1' && curToken->toString()[0] <= '9') {
+	if (this->CurTokenIsNumberConst()) {
 		this->UnsignedNumber();
 	}
 	else {
 		// its a string const
+		// TODO: fix it
 		this->GetNextToken();
 	}
 }
@@ -330,37 +271,27 @@ void CSyntax::UnsignedNumber() {
 }
 
 void CSyntax::FunctionDesignator() {
-	this->GetNextToken();
-	if (curToken->toString() == ")") {
-		this->GetNextToken();
+	this->AcceptKeyword(CKeyword::leftParSy);
+	if (this->TryAcceptKeyword(CKeyword::rightParSy)) {
 		return;
 	}
 	this->ActualParameter();
-	while (curToken->toString() == ",") {
-		this->GetNextToken();
+	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
 		this->ActualParameter();
 	}
-	if (curToken->toString() != ")") {
-		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::rightParSy);
 }
 
 void CSyntax::ProcedureStatement() {
-	this->GetNextToken();
-	if (curToken->toString() == ")") {
-		this->GetNextToken();
+	this->AcceptKeyword(CKeyword::leftParSy);
+	if (this->TryAcceptKeyword(CKeyword::rightParSy)) {
 		return;
 	}
 	this->ActualParameter();
-	while (curToken->toString() == ",") {
-		this->GetNextToken();
+	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
 		this->ActualParameter();
 	}
-	if (curToken->toString() != ")") {
-		CErrorSyntaxExpected(curToken.release(), ")").StdOutput();
-	}
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::rightParSy);
 }
 
 void CSyntax::ActualParameter() {
@@ -369,33 +300,31 @@ void CSyntax::ActualParameter() {
 
 
 void CSyntax::StructuredStatement() {
-	if (curToken->toString() == "if") {
+	if (this->CurTokenIsGivenKeyword(CKeyword::ifSy)) {
 		this->IfStatement();
 	}
-	else if (curToken->toString() == "while") {
+	else if (this->CurTokenIsGivenKeyword(CKeyword::whileSy)) {
 		this->WhileStatement();
+	}
+	else if (this->CurTokenIsGivenKeyword(CKeyword::caseSy)) {
+		this->CaseStatement();
 	}
 }
 
 void CSyntax::IfStatement() {
 	this->GetNextToken();
 	this->Expression();
-	if (curToken->toString() != "then") {
-		CErrorSyntaxExpected(curToken.release(), "then").StdOutput();
-	}
-
-	this->GetNextToken();
-	if (curToken->toString() == "begin") {
+	this->AcceptKeyword(CKeyword::thenSy);
+	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
 		this->StatementPart();
 	}
 	else {
 		this->Statement();
 	}
 	
-	if (curToken->toString() == "else") {
-		this->GetNextToken();
+	if (this->TryAcceptKeyword(CKeyword::elseSy)) {
 
-		if (curToken->toString() == "begin") {
+		if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
 			this->StatementPart();
 		}
 		else {
@@ -408,16 +337,21 @@ void CSyntax::IfStatement() {
 void CSyntax::WhileStatement() {
 	this->GetNextToken();
 	this->Expression();
-	if (curToken->toString() != "do") {
-		CErrorSyntaxExpected(curToken.release(), "do").StdOutput();
-	}
-	this->GetNextToken();
-	if (curToken->toString() == "begin") {
+	this->AcceptKeyword(CKeyword::doSy);
+	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
 		this->StatementPart();
 	}
 	else {
 		this->Statement();
 	}
+}
+
+void CSyntax::CaseStatement()
+{
+}
+
+void CSyntax::CaseListElement()
+{
 }
 
 void CSyntax::Identifier() {
@@ -432,6 +366,41 @@ void CSyntax::GetNextToken()
 	this->curToken = std::move(this->lexer->NextToken());
 }
 
+void CSyntax::AcceptKeyword(CKeyword kw)
+{
+	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
+	if (tempDerived->getKeyword() != kw) {
+		CErrorSyntaxExpectedKeyword(curToken.release(), kw).StdOutput();
+	}
+	this->GetNextToken();
+}
+
+bool CSyntax::TryAcceptKeyword(CKeyword kw)
+{
+	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
+	if (tempDerived->getKeyword() != kw) {
+		return false;
+	}
+	else {
+		this->GetNextToken();
+		return true;
+	}
+}
+
+bool CSyntax::CurTokenIsGivenKeyword(CKeyword kw)
+{
+	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
+	return tempDerived->getKeyword() == kw;
+}
+
+bool CSyntax::CurTokenIsNumberConst()
+{
+	CTokenConst* tempDerived = static_cast<CTokenConst*>(curToken.get());
+	return tempDerived->getVariantType() == VariantType::vtInt || tempDerived->getVariantType() == VariantType::vtReal;
+}
+
+
+
 CSyntax::CSyntax(CLexer* _lexer)
 {
 	this->lexer.reset(_lexer);
@@ -440,13 +409,11 @@ CSyntax::CSyntax(CLexer* _lexer)
 
 void CSyntax::Run()
 {
-	if (curToken->toString() == "program") {
+	if (this->CurTokenIsGivenKeyword(CKeyword::programSy)) {
 		this->Program();
 	}
 	else {
 		this->Block();
-		if (curToken->toString() != ".") {
-			CErrorSyntaxExpected(curToken.release(), ".").StdOutput();
-		}
+		this->AcceptKeyword(CKeyword::dotSy);
 	}
 }

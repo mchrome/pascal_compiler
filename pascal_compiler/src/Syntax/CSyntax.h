@@ -1,5 +1,8 @@
 #pragma once
 #include "../Lexer/clexer.h"
+#include "../Utils/ckeyword.h"
+#include "../Utils/cerror.h"
+#include "../Utils/cvariant.h"
 #include <memory>
 
 class CSyntax
@@ -42,8 +45,14 @@ private:
 	void StructuredStatement();
 	void IfStatement();
 	void WhileStatement();
+	void CaseStatement();
+	void CaseListElement();
 	void Identifier();
 	void GetNextToken();
+	void AcceptKeyword(CKeyword kw);
+	bool TryAcceptKeyword(CKeyword kw);
+	bool CurTokenIsGivenKeyword(CKeyword kw);
+	bool CurTokenIsNumberConst();
 public:
 	CSyntax(CLexer* _lexer);
 	void Run();

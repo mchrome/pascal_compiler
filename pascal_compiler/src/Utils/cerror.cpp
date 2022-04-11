@@ -40,3 +40,8 @@ void CErrorSyntaxExpected::FileOutput(std::string filePath)
 	std::ofstream fout(filePath);
 	fout << this->toString() << std::endl;
 }
+
+CErrorSyntaxExpectedKeyword::CErrorSyntaxExpectedKeyword(CToken* _received, CKeyword _expected) :
+	CErrorSyntaxExpected(_received, c_keywordsToStr.at(_expected))
+{
+}

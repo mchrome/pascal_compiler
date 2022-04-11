@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "ctoken.h"
+#include "ckeyword.h"
 #define PURE = 0
 
 class CError {
@@ -27,4 +28,9 @@ public:
 	std::string toString() override;
 	void StdOutput() override;
 	void FileOutput(std::string filePath) override;
+};
+
+class CErrorSyntaxExpectedKeyword : public CErrorSyntaxExpected {
+public:
+	CErrorSyntaxExpectedKeyword(CToken* _received, CKeyword _expected);
 };

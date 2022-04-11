@@ -17,7 +17,9 @@ enum class CKeyword : char {
 	ifSy,			// if 
 	thenSy,			// then 
 	elseSy,			// else 
-	whileSy,		// while 
+	whileSy,		// while
+	caseSy,			// case
+	ofSy,			// of
 	doSy,			// do 
 	andSy,			// and 
 	orSy,			// or 
