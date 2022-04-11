@@ -2,7 +2,7 @@
 
 
 void CSyntax::Program() {
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::programSy);
 	this->Identifier();
 	this->AcceptKeyword(CKeyword::semicolonSy);
 	this->Block();
@@ -45,7 +45,7 @@ void CSyntax::Type() {
 }
 
 void CSyntax::PointerType() {
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::pointerSy);
 	this->Identifier();
 }
 
@@ -82,7 +82,7 @@ void CSyntax::FuncionDeclaration() {
 }
 
 void CSyntax::FunctionHeading() {
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::functionSy);
 	this->Identifier();
 
 	if (this->TryAcceptKeyword(CKeyword::leftParSy)) {
@@ -262,13 +262,12 @@ void CSyntax::UnsignedConst() {
 	}
 	else {
 		// its a string const
-		// TODO: fix it
-		this->GetNextToken();
+		this->AcceptConst();
 	}
 }
 
 void CSyntax::UnsignedNumber() {
-	this->GetNextToken();
+	this->AcceptConst();
 }
 
 void CSyntax::FunctionDesignator() {
@@ -313,7 +312,7 @@ void CSyntax::StructuredStatement() {
 }
 
 void CSyntax::IfStatement() {
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::ifSy);
 	this->Expression();
 	this->AcceptKeyword(CKeyword::thenSy);
 	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
@@ -336,7 +335,7 @@ void CSyntax::IfStatement() {
 }
 
 void CSyntax::WhileStatement() {
-	this->GetNextToken();
+	this->AcceptKeyword(CKeyword::whileSy);
 	this->Expression();
 	this->AcceptKeyword(CKeyword::doSy);
 	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
