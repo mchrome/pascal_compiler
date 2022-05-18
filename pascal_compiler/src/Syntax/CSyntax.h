@@ -3,50 +3,56 @@
 #include "../Utils/ckeyword.h"
 #include "../Utils/cerror.h"
 #include "../Utils/cvariant.h"
+#include "../Utils/ctype.h"
+#include "../Semantic/csemantic.h"
+#include "../Utils/cparameters.h"
 #include <memory>
+
 
 class CSyntax
 {
 private:
+	std::unique_ptr<COutput> coutput;
 	std::unique_ptr<CLexer> lexer;
-	std::unique_ptr<CToken> curToken;
+	std::unique_ptr<CSemantic> semantic;
+	std::shared_ptr<CToken> curToken;
+	bool skipping;
+	bool insideBlock;
 	void Program();
 	void Block();
 	void TypeDeclarationPart();
 	void TypeDeclaration();
 	void Type();
-	void PointerType();
 	void VarDeclarationPart();
 	void VarDeclaration();
 	void FuncionDeclarationPart();
 	void FuncionDeclaration();
 	void FunctionHeading();
-	void FormalParameterSection();
-	void ParameterGroup();
+	std::shared_ptr<CParameters> FormalParameterSection();
+	std::shared_ptr<CParameters> ParameterGroup();
 	void StatementPart();
 	void CompoundStatement();
 	void Statement();
 	void SimpleStatement();
 	void AssignmentStatement();
 	void Variable();
-	void Expression();
+	CBaseType Expression();
 	void RelationalOperator();
-	void SimpleExpression();
+	CBaseType SimpleExpression();
 	void AddingOperator();
-	void Term();
+	CBaseType Term();
 	void MultiplyingOperator();
-	void Factor();
+	CBaseType Factor();
 	void UnaryOperator();
 	void UnsignedConst();
 	void UnsignedNumber();
-	void FunctionDesignator();
-	void ProcedureStatement();
-	void ActualParameter();
+	std::vector<CBaseType> FunctionDesignator();
+	CBaseType ActualParameter();
 	void StructuredStatement();
 	void IfStatement();
 	void WhileStatement();
 	void CaseStatement();
-	void CaseListElement();
+	void CaseListElement(CBaseType caseExprType);
 	void Identifier();
 	void GetNextToken();
 	void AcceptKeyword(CKeyword kw);

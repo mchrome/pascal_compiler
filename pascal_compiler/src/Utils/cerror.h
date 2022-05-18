@@ -4,6 +4,7 @@
 #include <fstream>
 #include "ctoken.h"
 #include "ckeyword.h"
+#include "ctype.h"
 #define PURE = 0
 
 class CError {
@@ -15,27 +16,76 @@ public:
 	int GetErrorPos();
 	CError(int _errorLine, int _errorPos);
 	virtual std::string toString() PURE;
-	virtual void StdOutput() PURE;
-	virtual void FileOutput(std::string filePath) PURE;
+	void StdOutput();
 };
 
 class CErrorSyntaxExpected : public CError {
 private:
-	std::unique_ptr<CToken> token;
+	std::shared_ptr<CToken> token;
 	std::string expected;
 public:
-	CErrorSyntaxExpected(CToken* _received, std::string _expected);
+	CErrorSyntaxExpected(std::shared_ptr<CToken> _received, std::string _expected);
 	std::string toString() override;
-	void StdOutput() override;
-	void FileOutput(std::string filePath) override;
 };
 
 class CErrorSyntaxExpectedKeyword : public CErrorSyntaxExpected {
 public:
-	CErrorSyntaxExpectedKeyword(CToken* _received, CKeyword _expected);
+	CErrorSyntaxExpectedKeyword(std::shared_ptr<CToken> _received, CKeyword _expected);
 };
 
 class CErrorSyntaxExpectedConst : public CErrorSyntaxExpected {
 public:
-	CErrorSyntaxExpectedConst(CToken* _received);
+	CErrorSyntaxExpectedConst(std::shared_ptr<CToken> _received);
+};
+
+class CErrorSemantic : public CError {
+protected:
+	std::shared_ptr<CToken> token;
+public:
+	CErrorSemantic(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticAlreadyDefined : public CErrorSemantic {
+public:
+	CErrorSemanticAlreadyDefined(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticNotDefined : public CErrorSemantic {
+public:
+	CErrorSemanticNotDefined(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticTypeMismatch : public CErrorSemantic {
+private:
+	std::string received;
+	std::string expected;
+
+public:
+	CErrorSemanticTypeMismatch(std::shared_ptr<CToken> token, CBaseType received, CBaseType expected);
+	std::string toString() override;
+};
+
+class CErrorSemanticWrongExprType : public CErrorSemantic {
+public:
+	CErrorSemanticWrongExprType(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticIncorrectParameters : public CErrorSemantic {
+public:
+	CErrorSemanticIncorrectParameters(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticWrongConstType : public CErrorSemantic {
+private:
+	std::string received;
+	std::string expected;
+
+public:
+	CErrorSemanticWrongConstType(std::shared_ptr<CToken> token, CBaseType received, CBaseType expected);
+	std::string toString() override;
 };

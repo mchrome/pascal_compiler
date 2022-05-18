@@ -17,10 +17,15 @@ CError::CError(int _errorLine, int _errorPos)
 	this->errorPos = _errorPos;
 }
 
-CErrorSyntaxExpected::CErrorSyntaxExpected(CToken* _received, std::string _expected)
+void CError::StdOutput()
+{
+	std::cout << this->toString() << std::endl;
+}
+
+CErrorSyntaxExpected::CErrorSyntaxExpected(std::shared_ptr<CToken> _received, std::string _expected)
 	: CError(_received->getLineNumber(), _received->getLinePosition())
 {
-	this->token.reset(_received);
+	this->token = _received;
 	this->expected = _expected;
 }
 
@@ -30,23 +35,91 @@ std::string CErrorSyntaxExpected::toString()
 		"\"" + this->expected + "\" was expected, but received " + this->token->toStringWithType() + " instead.";
 }
 
-void CErrorSyntaxExpected::StdOutput()
-{
-	std::cout << this->toString() << std::endl;
-}
 
-void CErrorSyntaxExpected::FileOutput(std::string filePath)
-{
-	std::ofstream fout(filePath);
-	fout << this->toString() << std::endl;
-}
-
-CErrorSyntaxExpectedKeyword::CErrorSyntaxExpectedKeyword(CToken* _received, CKeyword _expected) :
+CErrorSyntaxExpectedKeyword::CErrorSyntaxExpectedKeyword(std::shared_ptr<CToken> _received, CKeyword _expected) :
 	CErrorSyntaxExpected(_received, c_keywordsToStr.at(_expected))
 {
 }
 
-CErrorSyntaxExpectedConst::CErrorSyntaxExpectedConst(CToken* _received)
+CErrorSyntaxExpectedConst::CErrorSyntaxExpectedConst(std::shared_ptr<CToken> _received)
 	: CErrorSyntaxExpected(_received, "A constant")
 {
+}
+
+CErrorSemantic::CErrorSemantic(std::shared_ptr<CToken> token) : 
+	CError(token->getLineNumber(), token->getLinePosition())
+{
+	this->token = token;
+}
+
+std::string CErrorSemantic::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] "
+		+ this->token->toStringWithType() + " caused a semantic error.";
+	
+}
+
+CErrorSemanticAlreadyDefined::CErrorSemanticAlreadyDefined(std::shared_ptr<CToken> token) : CErrorSemantic(token)
+{
+}
+
+std::string CErrorSemanticAlreadyDefined::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] "
+		+ this->token->toStringWithType() + " is already defined in a local scope.";
+}
+
+CErrorSemanticNotDefined::CErrorSemanticNotDefined(std::shared_ptr<CToken> token) : CErrorSemantic(token)
+{
+}
+
+std::string CErrorSemanticNotDefined::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] "
+		+ this->token->toStringWithType() + " is not defined";
+}
+
+
+CErrorSemanticTypeMismatch::CErrorSemanticTypeMismatch(std::shared_ptr<CToken> token, CBaseType received, CBaseType expected) : CErrorSemantic(token)
+{
+	this->received = c_basetypeToStr.at(received);
+	this->expected = c_basetypeToStr.at(expected);
+}
+
+std::string CErrorSemanticTypeMismatch::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] "
+		+ this->token->toStringWithType() + " was assigned a " + this->received + " but its type is " + this->expected;
+}
+
+CErrorSemanticWrongExprType::CErrorSemanticWrongExprType(std::shared_ptr<CToken> token) : CErrorSemantic(token)
+{
+}
+
+std::string CErrorSemanticWrongExprType::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Expression type for "
+		+ this->token->toString() + " statement must be boolean.";
+}
+
+CErrorSemanticIncorrectParameters::CErrorSemanticIncorrectParameters(std::shared_ptr<CToken> token) : CErrorSemantic(token)
+{
+}
+
+std::string CErrorSemanticIncorrectParameters::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Parameters for function call of"
+		+ this->token->toStringWithType() + " do not match the definition.";
+}
+
+CErrorSemanticWrongConstType::CErrorSemanticWrongConstType(std::shared_ptr<CToken> token, CBaseType received, CBaseType expected) : CErrorSemantic(token)
+{
+	this->received = c_basetypeToStr.at(received);
+	this->expected = c_basetypeToStr.at(expected);
+}
+
+std::string CErrorSemanticWrongConstType::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Constant "
+		+ this->token->toStringWithType() + " has type " + this->received + " but type " + this->expected + " was expected.";
 }

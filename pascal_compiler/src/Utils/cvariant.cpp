@@ -1,16 +1,16 @@
 #include "cvariant.h"
 
-CVariant::CVariant(VariantType _variantType)
+CVariant::CVariant(CVariantType _variantType)
 {
 	this->variantType = _variantType;
 }
 
-VariantType CVariant::getVariantType()
+CVariantType CVariant::getVariantType()
 {
 	return this->variantType;
 }
 
-CVariantInt::CVariantInt(int _value) : CVariant(VariantType::vtInt)
+CVariantInt::CVariantInt(int _value) : CVariant(CVariantType::vtInt)
 {
 	this->value = _value;
 }
@@ -25,7 +25,7 @@ int CVariantInt::getValue()
 	return this->value;
 }
 
-CVariantReal::CVariantReal(double _value) : CVariant(VariantType::vtReal)
+CVariantReal::CVariantReal(double _value) : CVariant(CVariantType::vtReal)
 {
 	this->value = _value;
 }
@@ -40,7 +40,7 @@ double CVariantReal::getValue()
 	return this->value;
 }
 
-CVariantString::CVariantString(std::string _value) : CVariant(VariantType::vtString)
+CVariantString::CVariantString(std::string _value) : CVariant(CVariantType::vtString)
 {
 	this->value = _value;
 }
@@ -55,7 +55,7 @@ std::string CVariantString::getValue()
 	return this->value;
 }
 
-CVariantBoolean::CVariantBoolean(bool _value) : CVariant(VariantType::vtBoolean)
+CVariantBoolean::CVariantBoolean(bool _value) : CVariant(CVariantType::vtBoolean)
 {
 	this->value = _value;
 }

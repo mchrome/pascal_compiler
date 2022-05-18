@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -142,10 +142,12 @@
     <ClCompile Include="src\IO\cinputoutput.cpp" />
     <ClCompile Include="src\Lexer\clexer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Semantic\csemantic.cpp" />
     <ClCompile Include="src\Syntax\csyntax.cpp" />
     <ClCompile Include="src\Utils\cerror.cpp" />
-    <ClCompile Include="src\Utils\ckeyword.cpp" />
     <ClCompile Include="src\Utils\cliteral.cpp" />
+    <ClCompile Include="src\Utils\cparameters.cpp" />
+    <ClCompile Include="src\Utils\cscope.cpp" />
     <ClCompile Include="src\Utils\ctoken.cpp" />
     <ClCompile Include="src\Utils\cvariant.cpp" />
   </ItemGroup>
@@ -157,11 +159,15 @@
   <ItemGroup>
     <ClInclude Include="src\IO\cinputoutput.h" />
     <ClInclude Include="src\Lexer\clexer.h" />
+    <ClInclude Include="src\Semantic\csemantic.h" />
     <ClInclude Include="src\Syntax\csyntax.h" />
     <ClInclude Include="src\Utils\ckeyword.h" />
+    <ClInclude Include="src\Utils\cparameters.h" />
+    <ClInclude Include="src\Utils\cscope.h" />
     <ClInclude Include="src\Utils\ctoken.h" />
     <ClInclude Include="src\Utils\cerror.h" />
     <ClInclude Include="src\Utils\cliteral.h" />
+    <ClInclude Include="src\Utils\ctype.h" />
     <ClInclude Include="src\Utils\cvariant.h" />
   </ItemGroup>
   <ItemGroup>

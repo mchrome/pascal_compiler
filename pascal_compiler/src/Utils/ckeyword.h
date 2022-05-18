@@ -8,10 +8,6 @@ enum class CKeyword : char {
 	beginSy,		// begin 
 	endSy,			// end 
 	varSy,			// var 
-	integerSy,		// integer
-	realSy,			// real
-	stringSy,		// string
-	booleanSy,		// boolean
 	typeSy,			// type 
 	functionSy,		// function 
 	ifSy,			// if 
@@ -51,10 +47,6 @@ const std::map<std::string, CKeyword> c_strToKeywords = {
 	{"begin", CKeyword::beginSy},
 	{"end", CKeyword::endSy},
 	{"var", CKeyword::varSy},
-	{"integer", CKeyword::integerSy},
-	{"real", CKeyword::realSy},
-	{"string", CKeyword::stringSy},
-	{"boolean", CKeyword::booleanSy},
 	{"type", CKeyword::typeSy},
 	{"function", CKeyword::functionSy},
 	{"if", CKeyword::ifSy},
@@ -94,10 +86,6 @@ const std::map<CKeyword, std::string> c_keywordsToStr = {
 	{CKeyword::beginSy, "begin"},
 	{CKeyword::endSy, "end"},
 	{CKeyword::varSy, "var"},
-	{CKeyword::integerSy, "integer"},
-	{CKeyword::realSy, "real"},
-	{CKeyword::stringSy, "string"},
-	{CKeyword::booleanSy, "boolean"},
 	{CKeyword::typeSy, "type"},
 	{CKeyword::functionSy, "function"},
 	{CKeyword::ifSy, "if"},

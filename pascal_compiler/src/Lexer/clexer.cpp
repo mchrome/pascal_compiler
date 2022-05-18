@@ -39,7 +39,7 @@ std::unique_ptr<CToken> CLexer::readDigit()
 		if (curLiteral->c == '.') {
 			isFloat = true;
 		}
-		curLiteral = std::move(this->io->NextChar());
+		curLiteral = std::move(this->cinput->NextChar());
 	}
 
 
@@ -73,7 +73,7 @@ std::unique_ptr<CToken> CLexer::readIdentifier()
 		)
 	{
 		tokenStr += curLiteral->c;
-		curLiteral = std::move(this->io->NextChar());
+		curLiteral = std::move(this->cinput->NextChar());
 		
 		// only keywords made of letters can be found here
 		if (c_strToKeywords.count(tokenStr) != 0) {
@@ -105,15 +105,15 @@ std::unique_ptr<CToken> CLexer::readString()
 	std::string tokenStr = "";
 
 	// read first letter inside string const
-	curLiteral = std::move(this->io->NextChar());
+	curLiteral = std::move(this->cinput->NextChar());
 	
 	while (curLiteral->c != '\'') {
 		tokenStr += curLiteral->c;
-		curLiteral = std::move(this->io->NextChar());
+		curLiteral = std::move(this->cinput->NextChar());
 	}
 
 	// skip closing '
-	curLiteral = std::move(this->io->NextChar());
+	curLiteral = std::move(this->cinput->NextChar());
 
 
 	return std::make_unique<CTokenConst>(new CVariantString(tokenStr), curLiteral->lineNumber, curLiteral->linePosition);;
@@ -124,10 +124,11 @@ std::unique_ptr<CToken> CLexer::strToKeywordToken(std::string tokenStr)
 	return std::make_unique<CTokenKeyword>(c_strToKeywords.at(tokenStr), curLiteral->lineNumber, curLiteral->linePosition);
 }
 
-CLexer::CLexer(CInputOutput* _io)
+CLexer::CLexer(CInput* _io)
 {
-	this->io.reset(_io);
-	this->curLiteral = std::move(this->io->NextChar());
+	this->cinput.reset(_io);
+	this->coutput = std::make_unique<COutput>("compiler_lexer_output.txt");
+	this->curLiteral = std::move(this->cinput->NextChar());
 }
 
 CLexer::~CLexer()
@@ -143,17 +144,17 @@ std::unique_ptr<CToken> CLexer::NextToken()
 
 		// skip whitespaces, newlines, tabs, etc.
 		while (this->isIgnored(curLiteral->c)) {
-			curLiteral = std::move(this->io->NextChar());
+			curLiteral = std::move(this->cinput->NextChar());
 		}
 
 		// skip comments
 		while (curLiteral->c == '{') {
 			while (curLiteral->c != '}') {
-				curLiteral = std::move(this->io->NextChar());
+				curLiteral = std::move(this->cinput->NextChar());
 			}
 
 			// skip }
-			curLiteral = std::move(this->io->NextChar());
+			curLiteral = std::move(this->cinput->NextChar());
 
 			if (curLiteral->c == EOF) {
 				// TODO: unmatched comment opening
@@ -185,7 +186,7 @@ std::unique_ptr<CToken> CLexer::NextToken()
 	if (oneCharKeywords.count(curLiteral->c) > 0) {
 
 		std::string tokenStr(1, curLiteral->c);
-		this->curLiteral = std::move(this->io->NextChar());
+		this->curLiteral = std::move(this->cinput->NextChar());
 		return std::make_unique<CTokenKeyword>(c_strToKeywords.at(tokenStr), curLiteral->lineNumber, curLiteral->linePosition);
 	}
 
@@ -195,7 +196,7 @@ std::unique_ptr<CToken> CLexer::NextToken()
 
 		// read new literal
 		//std::unique_ptr<CLiteral> curLiteral = std::move(this->io->NextChar());
-		curLiteral = std::move(this->io->NextChar());
+		curLiteral = std::move(this->cinput->NextChar());
 
 		std::string tokenStr(1, this->specialPrev);
 
@@ -203,7 +204,7 @@ std::unique_ptr<CToken> CLexer::NextToken()
 			// <=, <>
 			if (curLiteral->c == '=' || curLiteral->c == '>') {
 				tokenStr += curLiteral->c;
-				curLiteral = std::move(this->io->NextChar());
+				curLiteral = std::move(this->cinput->NextChar());
 				return this->strToKeywordToken(tokenStr);
 			}
 		}
@@ -212,7 +213,7 @@ std::unique_ptr<CToken> CLexer::NextToken()
 			// >=
 			if (curLiteral->c == '=') {
 				tokenStr += curLiteral->c;
-				curLiteral = std::move(this->io->NextChar());
+				curLiteral = std::move(this->cinput->NextChar());
 				return this->strToKeywordToken(tokenStr);
 			}
 		}
@@ -221,7 +222,7 @@ std::unique_ptr<CToken> CLexer::NextToken()
 			// :=
 			if (curLiteral->c == '=') {
 				tokenStr += curLiteral->c;
-				curLiteral = std::move(this->io->NextChar());
+				curLiteral = std::move(this->cinput->NextChar());
 				return this->strToKeywordToken(tokenStr);
 			}
 		}

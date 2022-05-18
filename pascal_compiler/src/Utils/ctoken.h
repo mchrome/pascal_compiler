@@ -50,7 +50,7 @@ private:
 	std::unique_ptr<CVariant> value;
 public:
 	CTokenConst(CVariant* _value, int _lineNumber, int _linePosition);
-	VariantType getVariantType();
+	CVariantType getVariantType();
 	std::string toString() override;
 	std::string toStringWithType() override;
 };

@@ -55,7 +55,7 @@ CTokenConst::CTokenConst(CVariant* _value, int _lineNumber, int _linePosition)
 	this->value.reset(_value);
 }
 
-VariantType CTokenConst::getVariantType()
+CVariantType CTokenConst::getVariantType()
 {
 	return this->value->getVariantType();
 }

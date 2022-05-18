@@ -3,7 +3,7 @@
 
 #define PURE = 0
 
-enum class VariantType {
+enum class CVariantType {
 	vtInt,
 	vtReal,
 	vtString,
@@ -12,10 +12,10 @@ enum class VariantType {
 
 class CVariant {
 private:
-	VariantType variantType;
+	CVariantType variantType;
 public:
-	CVariant(VariantType _variantType);
-	VariantType getVariantType();
+	CVariant(CVariantType _variantType);
+	CVariantType getVariantType();
 	virtual std::string toString() PURE;
 };
 

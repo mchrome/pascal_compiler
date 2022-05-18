@@ -10,7 +10,8 @@
 class CLexer
 {
 private:
-	std::unique_ptr<CInputOutput> io;
+	std::unique_ptr<CInput> cinput;
+	std::unique_ptr<COutput> coutput;
 	bool isLetter(char c);
 	bool isDigit(char c);
 	bool isIgnored(char c);
@@ -21,7 +22,7 @@ private:
 	std::unique_ptr<CLiteral> curLiteral;
 	std::unique_ptr<CToken> strToKeywordToken(std::string tokenStr);
 public:
-	CLexer(CInputOutput* _io);
+	CLexer(CInput* _io);
 	~CLexer();
 	std::unique_ptr<CToken> NextToken();
 };

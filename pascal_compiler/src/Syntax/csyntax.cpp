@@ -1,19 +1,22 @@
 #include "CSyntax.h"
 
-
 void CSyntax::Program() {
 	this->AcceptKeyword(CKeyword::programSy);
 	this->Identifier();
 	this->AcceptKeyword(CKeyword::semicolonSy);
+	this->semantic->AddScope();
 	this->Block();
+	this->semantic->RemoveScope();
 	this->AcceptKeyword(CKeyword::dotSy);
 }
 
 void CSyntax::Block() {
+	this->insideBlock = true;
 	this->TypeDeclarationPart();
 	this->VarDeclarationPart();
 	this->FuncionDeclarationPart();
 	this->StatementPart();
+	this->insideBlock = false;
 }
 
 void CSyntax::TypeDeclarationPart() {
@@ -29,23 +32,15 @@ void CSyntax::TypeDeclarationPart() {
 }
 
 void CSyntax::TypeDeclaration() {
+	auto newType = curToken;
 	this->Identifier();
 	this->AcceptKeyword(CKeyword::equalSy);
+	auto existingType = curToken;
 	this->Type();
+	this->semantic->AddType(newType, existingType);
 }
 
 void CSyntax::Type() {
-	
-	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
-		this->Identifier();
-	}
-	else {
-		this->PointerType();
-	}
-}
-
-void CSyntax::PointerType() {
-	this->AcceptKeyword(CKeyword::pointerSy);
 	this->Identifier();
 }
 
@@ -61,12 +56,19 @@ void CSyntax::VarDeclarationPart() {
 }
 
 void CSyntax::VarDeclaration() {
+	std::vector<std::shared_ptr<CToken>> vars;
+	vars.push_back(curToken);
 	this->Identifier();
 	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
+		vars.push_back(curToken);
 		this->Identifier();
 	}
 	this->AcceptKeyword(CKeyword::colonSy);
+	auto type = curToken;
 	this->Type();
+	for (int i = 0; i < vars.size(); i++) {
+		this->semantic->AddIdentifier(vars[i], type);
+	}
 }
 
 void CSyntax::FuncionDeclarationPart() {
@@ -79,45 +81,68 @@ void CSyntax::FuncionDeclarationPart() {
 void CSyntax::FuncionDeclaration() {
 	this->FunctionHeading();
 	this->Block();
+	this->semantic->RemoveScope();
 }
 
 void CSyntax::FunctionHeading() {
 	this->AcceptKeyword(CKeyword::functionSy);
+	auto function = curToken;
 	this->Identifier();
 
+	auto parameters = std::make_shared<CParameters>();
+
 	if (this->TryAcceptKeyword(CKeyword::leftParSy)) {
-		this->FormalParameterSection();
+
+		parameters->AddParameters(this->FormalParameterSection());
 		while (this->TryAcceptKeyword(CKeyword::semicolonSy)) {
-			this->FormalParameterSection();
+			parameters->AddParameters(this->FormalParameterSection());
 		}
 	}
 	this->AcceptKeyword(CKeyword::rightParSy);
 	this->AcceptKeyword(CKeyword::colonSy);
+	auto functionType = curToken;
 	this->Type();
 	this->AcceptKeyword(CKeyword::semicolonSy);
+	this->semantic->AddFunction(function, functionType, parameters->types);
+	this->semantic->AddScope();
+	this->semantic->AddIdentifier(function, functionType);
+	for (int i = 0; i < parameters->names.size(); i++) {
+		this->semantic->AddIdentifier(parameters->names[i], parameters->types[i]);
+	}
+
 }
 
-void CSyntax::FormalParameterSection() {
+std::shared_ptr<CParameters> CSyntax::FormalParameterSection() {
 
 	if (curToken->getType() == CTokenType::ttIdentifier) {
-		this->ParameterGroup();
+		return this->ParameterGroup();
 	}
 
 	else if (this->TryAcceptKeyword(CKeyword::varSy)) {
-		this->ParameterGroup();
+		return this->ParameterGroup();
 	}
 
 }
 
-void CSyntax::ParameterGroup() {
+std::shared_ptr<CParameters> CSyntax::ParameterGroup() {
+	auto res = std::make_shared<CParameters>();
+	int cnt = 1;
+	auto paramName = curToken;
 	this->Identifier();
+	res->names.push_back(paramName);
 	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
+		auto paramName = curToken;
 		this->Identifier();
+		res->names.push_back(paramName);
+		cnt++;
 	}
 
 	this->AcceptKeyword(CKeyword::colonSy);
+	auto type = curToken;
 	this->Type();
-
+	res->types = std::vector<std::shared_ptr<CToken>>(cnt, type);
+	
+	return res;
 }
 
 void CSyntax::StatementPart() {
@@ -151,33 +176,24 @@ void CSyntax::Statement() {
 }
 
 void CSyntax::SimpleStatement() {
-	this->Identifier();
-	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy) || this->CurTokenIsGivenKeyword(CKeyword::assignSy))
-	{
-		this->AssignmentStatement();
-	}
-	else if (this->CurTokenIsGivenKeyword(CKeyword::leftParSy)) {
-		this->ProcedureStatement();
-	}
-	else {
-		// TODO: Expected error
-	}
+	this->AssignmentStatement();
 }
 
 void CSyntax::AssignmentStatement() {
-	if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
-		this->Variable();
-	}
+	auto varName = curToken;
+	this->semantic->EnsureIdentifierExistsGlobally(varName);
+	this->Variable();
 	this->AcceptKeyword(CKeyword::assignSy);
-	this->Expression();
+	CBaseType assignmentBaseType = this->Expression();
+	this->semantic->EnsureIdentifierTypeMatches(varName, assignmentBaseType);
 }
 
 void CSyntax::Variable() {
-	while (this->TryAcceptKeyword(CKeyword::pointerSy)) {}
+	this->Identifier();
 }
 
-void CSyntax::Expression() {
-	this->SimpleExpression();
+CBaseType CSyntax::Expression() {
+	CBaseType curBaseType = this->SimpleExpression();
 	while (this->CurTokenIsGivenKeyword(CKeyword::lessSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::greaterSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::greaterEqualSy) ||
@@ -185,70 +201,109 @@ void CSyntax::Expression() {
 		this->CurTokenIsGivenKeyword(CKeyword::equalSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::notEqualSy))
 	{
+		if (curBaseType == CBaseType::cTypeBoolean || curBaseType == CBaseType::cTypeString) {
+			// TODO: Cant COMPARE boolean/string 
+		}
+		curBaseType = CBaseType::cTypeBoolean;
 		this->RelationalOperator();
-		this->SimpleExpression();
+		CBaseType incomingBaseType = this->SimpleExpression();
+		if (incomingBaseType == CBaseType::cTypeBoolean || incomingBaseType == CBaseType::cTypeString) {
+			// TODO: Cant COMPARE boolean/string
+		}
 	}
+	return curBaseType;
 }
 
 void CSyntax::RelationalOperator() {
 	this->GetNextToken();
 }
 
-void CSyntax::SimpleExpression() {
-	this->Term();
+CBaseType CSyntax::SimpleExpression() {
+	CBaseType curBaseType = this->Term();
 	while (this->CurTokenIsGivenKeyword(CKeyword::plusSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::minusSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::orSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::xorSy))
 	{
+
+
+		if (curBaseType == CBaseType::cTypeBoolean || curBaseType == CBaseType::cTypeString) {
+			// TODO: Cant cast boolean/string 
+		}
+
 		this->AddingOperator();
-		this->Term();
+		CBaseType incomingBaseType = this->Term();
+		if (incomingBaseType == CBaseType::cTypeReal) {
+			curBaseType = CBaseType::cTypeReal;
+		}
+		else if (incomingBaseType == CBaseType::cTypeBoolean || incomingBaseType == CBaseType::cTypeString) {
+			// TODO: Cant cast boolean/string
+		}
 	}
+	return curBaseType;
 }
 
 void CSyntax::AddingOperator() {
 	this->GetNextToken();
 }
 
-void CSyntax::Term() {
-	this->Factor();
+CBaseType CSyntax::Term() {
+	CBaseType curBaseType = this->Factor();
 	while (this->CurTokenIsGivenKeyword(CKeyword::multiplySy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::divisionSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::andSy))
 	{
+		
+		if (curBaseType == CBaseType::cTypeBoolean || curBaseType == CBaseType::cTypeString) {
+			// TODO: Cant cast boolean/string 
+		}
+		
 		this->MultiplyingOperator();
-		this->Factor();
+		CBaseType incomingBaseType = this->Factor();
+		if (incomingBaseType == CBaseType::cTypeReal) {
+			curBaseType = CBaseType::cTypeReal;
+		}
+		else if (incomingBaseType == CBaseType::cTypeInt) {
+			curBaseType = CBaseType::cTypeInt;
+		}
+		else if (incomingBaseType == CBaseType::cTypeBoolean || incomingBaseType == CBaseType::cTypeString) {
+			// TODO: Cant cast boolean/string
+		}
 	}
+	return curBaseType;
 }
 
 void CSyntax::MultiplyingOperator() {
 	this->GetNextToken();
 }
 
-void CSyntax::Factor() {
+CBaseType CSyntax::Factor() {
 	if (curToken->getType() == CTokenType::ttConst) {
+		auto constTokenRef = std::dynamic_pointer_cast<CTokenConst>(curToken);
 		this->UnsignedConst();
+		return this->semantic->GetBaseTypeOfConstToken(constTokenRef);
 	}
 	else if (this->CurTokenIsGivenKeyword(CKeyword::plusSy) ||
 		this->CurTokenIsGivenKeyword(CKeyword::minusSy) ||
-		this->CurTokenIsGivenKeyword(CKeyword::notSy) ||
-		this->CurTokenIsGivenKeyword(CKeyword::addressSy))
+		this->CurTokenIsGivenKeyword(CKeyword::notSy))
 	{
 		this->UnaryOperator();
-		this->Factor();
+		return this->Factor();
 	}
 	else if (this->TryAcceptKeyword(CKeyword::leftParSy)) {
-		this->Expression();
+		auto exprType = this->Expression();
 		this->AcceptKeyword(CKeyword::rightParSy);
+		return exprType;
 	}
 	else if (curToken->getType() == CTokenType::ttIdentifier) {
+		auto identifierName = curToken;
+		this->semantic->EnsureIdentifierExistsGlobally(identifierName);
 		this->Identifier();
-		if (this->CurTokenIsGivenKeyword(CKeyword::pointerSy)) {
-			this->Variable();
+		if (this->CurTokenIsGivenKeyword(CKeyword::leftParSy)) {
+			auto funcParameterTypes = this->FunctionDesignator();
+			this->semantic->EnsureFunctionParametersMatch(identifierName, funcParameterTypes);
 		}
-		else if (this->CurTokenIsGivenKeyword(CKeyword::leftParSy)) {
-			this->FunctionDesignator();
-		}
+		return semantic->GetIdentifierBaseType(identifierName->toString());
 	}
 }
 
@@ -270,32 +325,22 @@ void CSyntax::UnsignedNumber() {
 	this->AcceptConst();
 }
 
-void CSyntax::FunctionDesignator() {
+std::vector<CBaseType> CSyntax::FunctionDesignator() {
 	this->AcceptKeyword(CKeyword::leftParSy);
 	if (this->TryAcceptKeyword(CKeyword::rightParSy)) {
-		return;
+		return std::vector<CBaseType>();
 	}
-	this->ActualParameter();
+	std::vector<CBaseType> callTypes;
+	callTypes.push_back(this->ActualParameter());
 	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
-		this->ActualParameter();
+		callTypes.push_back(this->ActualParameter());
 	}
 	this->AcceptKeyword(CKeyword::rightParSy);
+	return callTypes;
 }
 
-void CSyntax::ProcedureStatement() {
-	this->AcceptKeyword(CKeyword::leftParSy);
-	if (this->TryAcceptKeyword(CKeyword::rightParSy)) {
-		return;
-	}
-	this->ActualParameter();
-	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
-		this->ActualParameter();
-	}
-	this->AcceptKeyword(CKeyword::rightParSy);
-}
-
-void CSyntax::ActualParameter() {
-	this->Expression();
+CBaseType CSyntax::ActualParameter() {
+	return this->Expression();
 }
 
 
@@ -312,8 +357,10 @@ void CSyntax::StructuredStatement() {
 }
 
 void CSyntax::IfStatement() {
+	auto statementKeyword = curToken;
 	this->AcceptKeyword(CKeyword::ifSy);
-	this->Expression();
+	auto exprType = this->Expression();
+	this->semantic->EnsureExpressionIsBool(statementKeyword, exprType, CBaseType::cTypeBoolean);
 	this->AcceptKeyword(CKeyword::thenSy);
 	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
 		this->StatementPart();
@@ -335,8 +382,10 @@ void CSyntax::IfStatement() {
 }
 
 void CSyntax::WhileStatement() {
+	auto statementKeyword = curToken;
 	this->AcceptKeyword(CKeyword::whileSy);
-	this->Expression();
+	auto exprType = this->Expression();
+	this->semantic->EnsureExpressionIsBool(statementKeyword, exprType, CBaseType::cTypeBoolean);
 	this->AcceptKeyword(CKeyword::doSy);
 	if (this->CurTokenIsGivenKeyword(CKeyword::beginSy)) {
 		this->StatementPart();
@@ -349,23 +398,27 @@ void CSyntax::WhileStatement() {
 void CSyntax::CaseStatement()
 {
 	this->AcceptKeyword(CKeyword::caseSy);
-	this->Expression();
+	auto exprType = this->Expression();
 	this->AcceptKeyword(CKeyword::ofSy);
-	this->CaseListElement();
+	this->CaseListElement(exprType);
 	while (this->TryAcceptKeyword(CKeyword::semicolonSy)) {
-		this->CaseListElement();
+		this->CaseListElement(exprType);
 	}
 	this->AcceptKeyword(CKeyword::endSy);
 }
 
-void CSyntax::CaseListElement()
+void CSyntax::CaseListElement(CBaseType caseExprType)
 {
 	// Check if CaseListElement is empty, if so exit
 	if (this->CurTokenIsGivenKeyword(CKeyword::endSy)) return;
 
+	auto constToken = curToken;
 	this->UnsignedConst();
+	this->semantic->EnsureConstTypeMatches(constToken, caseExprType);
 	while (this->TryAcceptKeyword(CKeyword::commaSy)) {
+		auto constToken = curToken;
 		this->UnsignedConst();
+		this->semantic->EnsureConstTypeMatches(constToken, caseExprType);
 	}
 	this->AcceptKeyword(CKeyword::colonSy);
 
@@ -380,28 +433,31 @@ void CSyntax::CaseListElement()
 
 void CSyntax::Identifier() {
 	if (this->curToken->getType() != CTokenType::ttIdentifier) {
-		CErrorSyntaxExpected(curToken.release(), "An identifier").StdOutput();
+		this->coutput->WriteErrorStd(std::make_shared<CErrorSyntaxExpected>(curToken, "An identifier"));
+		exit(0);
 	}
 	this->GetNextToken();
 }
 
 void CSyntax::GetNextToken()
 {
-	this->curToken = std::move(this->lexer->NextToken());
+	this->curToken.reset(this->lexer->NextToken().release());
 }
 
 void CSyntax::AcceptKeyword(CKeyword kw)
 {
-	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
-	if (tempDerived->getKeyword() != kw) {
-		CErrorSyntaxExpectedKeyword(curToken.release(), kw).StdOutput();
+	std::shared_ptr<CTokenKeyword> tempDerived = std::dynamic_pointer_cast<CTokenKeyword>(curToken);
+	if (tempDerived == nullptr || tempDerived->getKeyword() != kw) {
+		this->coutput->WriteErrorStd(std::make_shared<CErrorSyntaxExpectedKeyword>(curToken, kw));
+		exit(0);
 	}
 	this->GetNextToken();
 }
 
 bool CSyntax::TryAcceptKeyword(CKeyword kw)
 {
-	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
+	std::shared_ptr<CTokenKeyword> tempDerived = std::dynamic_pointer_cast<CTokenKeyword>(curToken);
+	if (tempDerived == nullptr) return false;
 	if (tempDerived->getKeyword() != kw) {
 		return false;
 	}
@@ -413,25 +469,28 @@ bool CSyntax::TryAcceptKeyword(CKeyword kw)
 
 bool CSyntax::CurTokenIsGivenKeyword(CKeyword kw)
 {
-	CTokenKeyword* tempDerived = static_cast<CTokenKeyword*>(curToken.get());
+	std::shared_ptr<CTokenKeyword> tempDerived = std::dynamic_pointer_cast<CTokenKeyword>(curToken);
+	if (tempDerived == nullptr) return false;
 	return tempDerived->getKeyword() == kw;
 }
 
 bool CSyntax::CurTokenIsNumberConst()
 {
-	CTokenConst* tempDerived = static_cast<CTokenConst*>(curToken.get());
-	return tempDerived->getVariantType() == VariantType::vtInt || tempDerived->getVariantType() == VariantType::vtReal;
+	std::shared_ptr<CTokenConst> tempDerived = std::dynamic_pointer_cast<CTokenConst>(curToken);
+	if (tempDerived == nullptr) return false;
+	return tempDerived->getVariantType() == CVariantType::vtInt || tempDerived->getVariantType() == CVariantType::vtReal;
 }
 
 bool CSyntax::CurTokenIsConst()
 {
-	return dynamic_cast<CTokenConst*>(curToken.get()) != nullptr;
+	return curToken->getType() == CTokenType::ttConst;
 }
 
 void CSyntax::AcceptConst()
 {
 	if (!this->CurTokenIsConst()) {
-		CErrorSyntaxExpectedConst(curToken.release()).StdOutput();
+		this->coutput->WriteErrorStd(std::make_shared<CErrorSyntaxExpectedConst>(curToken));
+		exit(0);
 	}
 	this->GetNextToken();
 }
@@ -440,7 +499,18 @@ void CSyntax::AcceptConst()
 
 CSyntax::CSyntax(CLexer* _lexer)
 {
+	this->coutput = std::make_unique<COutput>("compiler_syntax_output.txt");
+	this->skipping = false;
+	this->insideBlock = false;
 	this->lexer.reset(_lexer);
+	this->semantic = std::make_unique<CSemantic>();
+	this->semantic->AddScope();
+	this->semantic->AddBaseType("integer", CBaseType::cTypeInt);
+	this->semantic->AddBaseType("boolean", CBaseType::cTypeBoolean);
+	this->semantic->AddBaseType("real", CBaseType::cTypeReal);
+	this->semantic->AddBaseType("string", CBaseType::cTypeString);
+	this->semantic->AddBaseIdentifier("true", "boolean");
+	this->semantic->AddBaseIdentifier("false", "boolean");
 	this->GetNextToken();
 }
 

@@ -3,15 +3,23 @@
 #include "../Utils/cliteral.h"
 #include "../Utils/cerror.h"
 #include <memory>
-class CInputOutput {
+class CInput {
 
 private:
 	int currentLine;
 	int currentLinePosition;
 	std::ifstream inputFileStream;
-	std::ofstream outputFileStream;
 
 public:
-	CInputOutput(std::string filePath, std::string outputPath);
+	CInput(std::string inputFilePath);
 	std::unique_ptr<CLiteral> NextChar();
+};
+
+class COutput {
+private:
+	std::ofstream outputFileStream;
+public:
+	COutput(std::string outFilePath);
+	void WriteErrorStd(std::shared_ptr<CError> err);
+	void WriteErrorFile(std::shared_ptr<CError> err);
 };

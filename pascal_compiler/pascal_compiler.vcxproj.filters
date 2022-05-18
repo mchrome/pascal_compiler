@@ -36,10 +36,16 @@
     <ClCompile Include="src\Utils\cvariant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utils\ckeyword.cpp">
+    <ClCompile Include="src\Syntax\csyntax.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Syntax\csyntax.cpp">
+    <ClCompile Include="src\Semantic\csemantic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\cscope.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\cparameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,6 +77,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Syntax\csyntax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Semantic\csemantic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\cscope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\cparameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

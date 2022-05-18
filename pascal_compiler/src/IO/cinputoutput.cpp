@@ -1,13 +1,12 @@
 #include "cinputoutput.h"
 
-CInputOutput::CInputOutput(std::string filePath, std::string outputPath) {
+CInput::CInput(std::string filePath) {
 	this->inputFileStream = std::ifstream(filePath);
-	this->outputFileStream = std::ofstream(outputPath);
 	this->currentLine = 0;
 	this->currentLinePosition = 0;
 }
 
-std::unique_ptr<CLiteral> CInputOutput::NextChar() {
+std::unique_ptr<CLiteral> CInput::NextChar() {
 	char c = this->inputFileStream.get();
 	
 	std::unique_ptr<CLiteral> l = std::make_unique<CLiteral>(c, this->currentLine, this->currentLinePosition);
@@ -19,4 +18,19 @@ std::unique_ptr<CLiteral> CInputOutput::NextChar() {
 	}
 
 	return l;
+}
+
+COutput::COutput(std::string outFilePath)
+{
+	this->outputFileStream = std::ofstream(outFilePath);
+}
+
+void COutput::WriteErrorStd(std::shared_ptr<CError> err)
+{
+	std::cout << err->toString() << "\n";
+}
+
+void COutput::WriteErrorFile(std::shared_ptr<CError> err)
+{
+	this->outputFileStream << err->toString() << "\n";
 }
