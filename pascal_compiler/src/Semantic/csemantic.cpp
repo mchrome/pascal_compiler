@@ -237,7 +237,7 @@ bool CSemantic::CanTypeCast(CBaseType type, std::shared_ptr<CToken> token)
 
 	if (op == CKeyword::notSy && type != CBaseType::cTypeBoolean)
 		return false;
-	else if ((op == CKeyword::plusSy || op == CKeyword::minusSy) && (type == CBaseType::cTypeInt || type == CBaseType::cTypeReal))
+	else if ((op == CKeyword::plusSy || op == CKeyword::minusSy) && (type != CBaseType::cTypeInt && type != CBaseType::cTypeReal))
 		return false;
 	return true;
 }
