@@ -5,6 +5,7 @@
 #include "ctoken.h"
 #include "ckeyword.h"
 #include "ctype.h"
+#include "cliteral.h"
 #define PURE = 0
 
 class CError {
@@ -19,24 +20,72 @@ public:
 	void StdOutput();
 };
 
-class CErrorSyntaxExpected : public CError {
+class CErrorLexer : public CError {
+private:
+	std::shared_ptr<CLiteral> literal;
+public:
+	CErrorLexer(std::shared_ptr<CLiteral> literal);
+};
+
+class CErrorLexerUnknownLiteral : public CErrorLexer {
+public:
+	CErrorLexerUnknownLiteral(std::shared_ptr<CLiteral> literal);
+	std::string toString() override;
+};
+
+class CErrorLexerIncorrectNumber : public CErrorLexer {
+public:
+	CErrorLexerIncorrectNumber(std::shared_ptr<CLiteral> literal);
+	std::string toString() override;
+};
+
+class CErorLexerUnmatchedCommentOpening : public CErrorLexer {
+public:
+	CErorLexerUnmatchedCommentOpening(std::shared_ptr<CLiteral> literal);
+	std::string toString() override;
+};
+
+class CErrorLexerUnmatchedStringQuotes : public CErrorLexer {
+public:
+	CErrorLexerUnmatchedStringQuotes(std::shared_ptr<CLiteral> literal);
+	std::string toString() override;
+};
+
+class CErorLexerUnmatchedCommentEnding : public CErrorLexer {
+public:
+	CErorLexerUnmatchedCommentEnding(std::shared_ptr<CLiteral> literal);
+	std::string toString() override;
+};
+
+
+class CErrorSyntaxUnexpectedKeyword : public CError {
+private:
+	std::shared_ptr<CToken> token;
+public:
+	CErrorSyntaxUnexpectedKeyword(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSyntaxExpectedIdentifier : public CError {
 private:
 	std::shared_ptr<CToken> token;
 	std::string expected;
 public:
-	CErrorSyntaxExpected(std::shared_ptr<CToken> _received, std::string _expected);
+	CErrorSyntaxExpectedIdentifier(std::shared_ptr<CToken> _received, std::string _expected);
 	std::string toString() override;
 };
 
-class CErrorSyntaxExpectedKeyword : public CErrorSyntaxExpected {
+class CErrorSyntaxExpectedKeyword : public CErrorSyntaxExpectedIdentifier {
 public:
 	CErrorSyntaxExpectedKeyword(std::shared_ptr<CToken> _received, CKeyword _expected);
 };
 
-class CErrorSyntaxExpectedConst : public CErrorSyntaxExpected {
+class CErrorSyntaxExpectedConst : public CErrorSyntaxExpectedIdentifier {
 public:
 	CErrorSyntaxExpectedConst(std::shared_ptr<CToken> _received);
 };
+
+
 
 class CErrorSemantic : public CError {
 protected:
@@ -77,6 +126,12 @@ public:
 class CErrorSemanticIncorrectParameters : public CErrorSemantic {
 public:
 	CErrorSemanticIncorrectParameters(std::shared_ptr<CToken> token);
+	std::string toString() override;
+};
+
+class CErrorSemanticCantTypeCast : public CErrorSemantic {
+public:
+	CErrorSemanticCantTypeCast(std::shared_ptr<CToken> token);
 	std::string toString() override;
 };
 

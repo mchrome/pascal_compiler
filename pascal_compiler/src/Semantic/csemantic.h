@@ -31,5 +31,9 @@ public:
 	void EnsureExpressionIsBool(std::shared_ptr<CToken> statementKeyword, CBaseType exprType, CBaseType expected);
 	bool ConstTypeMatches(std::shared_ptr<CToken> constToken, CBaseType exprType);
 	void EnsureConstTypeMatches(std::shared_ptr<CToken> constToken, CBaseType exprType);
+	bool CanTypeCast(CBaseType left, CBaseType right, std::shared_ptr<CToken> token);
+	bool CanTypeCast(CBaseType type, std::shared_ptr<CToken> token);
+	void EnsureCanTypeCast(CBaseType type, std::shared_ptr<CToken> token);
+	void EnsureCanTypeCast(CBaseType left, CBaseType right, std::shared_ptr<CToken> op);
 	CBaseType GetBaseTypeOfConstToken(std::shared_ptr<CTokenConst> token);
 };

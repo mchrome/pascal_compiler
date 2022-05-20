@@ -136,7 +136,9 @@ bool CSemantic::TypeExistsGlobally(std::string identifier)
 
 bool CSemantic::IdentifierTypeMatches(std::shared_ptr<CToken> identifier, CBaseType type)
 {
-	return GetIdentifierBaseType(identifier->toString()) == type;
+	auto identTokenBaseType = GetIdentifierBaseType(identifier->toString());
+
+	return identTokenBaseType == type || (identTokenBaseType == CBaseType::cTypeReal && type == CBaseType::cTypeInt);
 }
 
 void CSemantic::EnsureIdentifierTypeMatches(std::shared_ptr<CToken> identifier, CBaseType type)
@@ -187,9 +189,14 @@ void CSemantic::EnsureExpressionIsBool(std::shared_ptr<CToken> statementKeyword,
 	}
 }
 
-bool CSemantic::ConstTypeMatches(std::shared_ptr<CToken> constToken, CBaseType exprType)
+bool CSemantic::ConstTypeMatches(std::shared_ptr<CToken> token, CBaseType exprType)
 {
-	return GetBaseTypeOfConstToken(std::dynamic_pointer_cast<CTokenConst>(constToken)) == exprType;
+	auto constToken = std::dynamic_pointer_cast<CTokenConst>(token);
+	if (constToken == nullptr) return false;
+
+	auto constTokenBaseType = GetBaseTypeOfConstToken(constToken);
+
+	return constTokenBaseType == exprType || (constTokenBaseType == CBaseType::cTypeReal && exprType == CBaseType::cTypeInt);
 }
 
 void CSemantic::EnsureConstTypeMatches(std::shared_ptr<CToken> constToken, CBaseType exprType)
@@ -200,6 +207,52 @@ void CSemantic::EnsureConstTypeMatches(std::shared_ptr<CToken> constToken, CBase
 			exprType
 			)
 		);
+	}
+}
+
+bool CSemantic::CanTypeCast(CBaseType left, CBaseType right, std::shared_ptr<CToken> token)
+{
+	auto tokenKw = std::dynamic_pointer_cast<CTokenKeyword>(token);
+	if (tokenKw == nullptr) return false;
+	CKeyword op = tokenKw->getKeyword();
+
+
+	if ((op == CKeyword::andSy || op == CKeyword::orSy || op == CKeyword::xorSy) && (left != CBaseType::cTypeBoolean || right!= CBaseType::cTypeBoolean)) {
+		return false;
+	}
+	else if (left == CBaseType::cTypeString || right == CBaseType::cTypeString) {
+		return false;
+	}
+	else if ((op == CKeyword::plusSy || op == CKeyword::minusSy) && !(left == CBaseType::cTypeInt || left == CBaseType::cTypeReal)
+		&& !(right == CBaseType::cTypeInt || right == CBaseType::cTypeReal))
+		return false;
+	return true;
+}
+
+bool CSemantic::CanTypeCast(CBaseType type, std::shared_ptr<CToken> token)
+{
+	auto tokenKw = std::dynamic_pointer_cast<CTokenKeyword>(token);
+	if (tokenKw == nullptr) return false;
+	CKeyword op = tokenKw->getKeyword();
+
+	if (op == CKeyword::notSy && type != CBaseType::cTypeBoolean)
+		return false;
+	else if ((op == CKeyword::plusSy || op == CKeyword::minusSy) && (type == CBaseType::cTypeInt || type == CBaseType::cTypeReal))
+		return false;
+	return true;
+}
+
+void CSemantic::EnsureCanTypeCast(CBaseType type, std::shared_ptr<CToken> token)
+{
+	if (!CanTypeCast(type, token)) {
+		this->coutput->WriteErrorStd(std::make_shared<CErrorSemanticCantTypeCast>(token));
+	}
+}
+
+void CSemantic::EnsureCanTypeCast(CBaseType left, CBaseType right, std::shared_ptr<CToken> token)
+{
+	if (!CanTypeCast(left, right, token)) {
+		this->coutput->WriteErrorStd(std::make_shared<CErrorSemanticCantTypeCast>(token));
 	}
 }
 

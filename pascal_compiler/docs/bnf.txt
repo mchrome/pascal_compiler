@@ -47,8 +47,7 @@ function <identifier>(<formalParameterSection>{;<formalParameterSection>}):<type
 
 <structuredStatement> ::= <ifStatement>|<whileStatement>|<caseStatement>
 
-<ifStatement> ::= if <expression> then <statement> | if <expression> then <statementPart> | if<expression> then <statement> else <statement>
-| if<expression> then <statementPart> else <statementPart> | if<expression> then <statement> else <statementPart> | if<expression> then <statementPart> else <statement>
-<whileStatement> ::= while <expression> do <statement> | while <expression> do <statementPart>
+<ifStatement> ::= if <expression> then <statement> | if<expression> then <statement> else <statement>
+<whileStatement> ::= while <expression> do <statement>
 <caseStatement> ::= case <expression> of <case list element> {; <case list element> } end
-<caseListElement> ::= <empty> | <unsignedConst>{, <unsignedConst> } : <statement> | <unsignedConst>{, <unsignedConst> } : <statementPart>
+<caseListElement> ::= <empty> | <unsignedConst>{, <unsignedConst> } : <statement>

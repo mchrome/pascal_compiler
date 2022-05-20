@@ -155,6 +155,7 @@
     <None Include="tests\case.pas" />
     <None Include="tests\dijkstra.pas" />
     <None Include="tests\hello.pas" />
+    <None Include="tests\lexer.pas" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\IO\cinputoutput.h" />

@@ -21,8 +21,6 @@ enum class CKeyword : char {
 	orSy,			// or 
 	xorSy,			// xor 
 	notSy,			// not 
-	addressSy,		// @ 
-	pointerSy,		// ^
 	plusSy,			// +
 	minusSy,		// - 
 	multiplySy,		// *
@@ -40,6 +38,7 @@ enum class CKeyword : char {
 	lessEqualSy,	// <=
 	greaterEqualSy,	// >=
 	notEqualSy,		// <>
+	eofSy           // EOF
 };
 
 const std::map<std::string, CKeyword> c_strToKeywords = {
@@ -60,8 +59,6 @@ const std::map<std::string, CKeyword> c_strToKeywords = {
 	{"or", CKeyword::orSy},
 	{"xor", CKeyword::xorSy},
 	{"not", CKeyword::notSy},
-	{"@", CKeyword::addressSy},
-	{"^", CKeyword::pointerSy},
 	{"+", CKeyword::plusSy},
 	{"-", CKeyword::minusSy},
 	{"*", CKeyword::multiplySy},
@@ -79,6 +76,7 @@ const std::map<std::string, CKeyword> c_strToKeywords = {
 	{"<=", CKeyword::lessEqualSy},
 	{">=", CKeyword::greaterEqualSy},
 	{"<>", CKeyword::notEqualSy},
+	{"EOF", CKeyword::eofSy}
 };
 
 const std::map<CKeyword, std::string> c_keywordsToStr = {
@@ -99,8 +97,6 @@ const std::map<CKeyword, std::string> c_keywordsToStr = {
 	{CKeyword::orSy, "or"},
 	{CKeyword::xorSy, "xor"},
 	{CKeyword::notSy, "not"},
-	{CKeyword::addressSy, "@"},
-	{CKeyword::pointerSy, "^"},
 	{CKeyword::plusSy, "+"},
 	{CKeyword::minusSy, "-"},
 	{CKeyword::multiplySy, "*"},
@@ -118,11 +114,10 @@ const std::map<CKeyword, std::string> c_keywordsToStr = {
 	{CKeyword::lessEqualSy, "<="},
 	{CKeyword::greaterEqualSy, ">=" },
 	{CKeyword::notEqualSy, "<>"},
+	{CKeyword::eofSy, "EOF"}
 };
 
 const std::set<char> oneCharKeywords = {
-	'@',
-	'^',
 	'+',
 	'-',
 	'*',

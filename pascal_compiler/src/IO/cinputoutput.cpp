@@ -6,10 +6,10 @@ CInput::CInput(std::string filePath) {
 	this->currentLinePosition = 0;
 }
 
-std::unique_ptr<CLiteral> CInput::NextChar() {
+std::shared_ptr<CLiteral> CInput::NextChar() {
 	char c = this->inputFileStream.get();
 	
-	std::unique_ptr<CLiteral> l = std::make_unique<CLiteral>(c, this->currentLine, this->currentLinePosition);
+	std::shared_ptr<CLiteral> l = std::make_shared<CLiteral>(c, this->currentLine, this->currentLinePosition);
 
 	this->currentLinePosition++;
 	if (c == '\n') {

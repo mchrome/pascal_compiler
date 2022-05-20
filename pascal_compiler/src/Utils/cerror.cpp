@@ -22,14 +22,14 @@ void CError::StdOutput()
 	std::cout << this->toString() << std::endl;
 }
 
-CErrorSyntaxExpected::CErrorSyntaxExpected(std::shared_ptr<CToken> _received, std::string _expected)
+CErrorSyntaxExpectedIdentifier::CErrorSyntaxExpectedIdentifier(std::shared_ptr<CToken> _received, std::string _expected)
 	: CError(_received->getLineNumber(), _received->getLinePosition())
 {
 	this->token = _received;
 	this->expected = _expected;
 }
 
-std::string CErrorSyntaxExpected::toString()
+std::string CErrorSyntaxExpectedIdentifier::toString()
 {
 	return "CSyntax [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] " +
 		"\"" + this->expected + "\" was expected, but received " + this->token->toStringWithType() + " instead.";
@@ -37,12 +37,12 @@ std::string CErrorSyntaxExpected::toString()
 
 
 CErrorSyntaxExpectedKeyword::CErrorSyntaxExpectedKeyword(std::shared_ptr<CToken> _received, CKeyword _expected) :
-	CErrorSyntaxExpected(_received, c_keywordsToStr.at(_expected))
+	CErrorSyntaxExpectedIdentifier(_received, c_keywordsToStr.at(_expected))
 {
 }
 
 CErrorSyntaxExpectedConst::CErrorSyntaxExpectedConst(std::shared_ptr<CToken> _received)
-	: CErrorSyntaxExpected(_received, "A constant")
+	: CErrorSyntaxExpectedIdentifier(_received, "A constant")
 {
 }
 
@@ -108,7 +108,7 @@ CErrorSemanticIncorrectParameters::CErrorSemanticIncorrectParameters(std::shared
 
 std::string CErrorSemanticIncorrectParameters::toString()
 {
-	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Parameters for function call of"
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Parameters for function call of "
 		+ this->token->toStringWithType() + " do not match the definition.";
 }
 
@@ -122,4 +122,75 @@ std::string CErrorSemanticWrongConstType::toString()
 {
 	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Constant "
 		+ this->token->toStringWithType() + " has type " + this->received + " but type " + this->expected + " was expected.";
+}
+
+CErorLexerUnmatchedCommentOpening::CErorLexerUnmatchedCommentOpening(std::shared_ptr<CLiteral> literal) : CErrorLexer(literal)
+{
+}
+
+std::string CErorLexerUnmatchedCommentOpening::toString()
+{
+	return "CLexer [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Unmatched comment opening.";
+}
+
+CErrorLexer::CErrorLexer(std::shared_ptr<CLiteral> literal) : CError(literal->lineNumber, literal->linePosition)
+{
+	this->literal = literal;
+}
+
+CErorLexerUnmatchedCommentEnding::CErorLexerUnmatchedCommentEnding(std::shared_ptr<CLiteral> literal):CErrorLexer(literal)
+{
+}
+
+std::string CErorLexerUnmatchedCommentEnding::toString()
+{
+	return "CLexer [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Unmatched comment ending.";
+}
+
+CErrorSemanticCantTypeCast::CErrorSemanticCantTypeCast(std::shared_ptr<CToken> token) : CErrorSemantic(token)
+{
+}
+
+std::string CErrorSemanticCantTypeCast::toString()
+{
+	return "CSemantic [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Can't perform a type cast.";
+}
+
+CErrorSyntaxUnexpectedKeyword::CErrorSyntaxUnexpectedKeyword(std::shared_ptr<CToken> token) 
+	: CError(token->getLineNumber(), token->getLinePosition())
+{
+	this->token = token;
+}
+
+std::string CErrorSyntaxUnexpectedKeyword::toString()
+{
+	return "CSyntax [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Recieved an unexpected keyword " + 
+		this->token->toStringWithType();
+}
+
+CErrorLexerIncorrectNumber::CErrorLexerIncorrectNumber(std::shared_ptr<CLiteral> literal) : CErrorLexer(literal) {
+
+}
+
+std::string CErrorLexerIncorrectNumber::toString()
+{
+	return "CLexer [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Incorrect number.";
+}
+
+CErrorLexerUnknownLiteral::CErrorLexerUnknownLiteral(std::shared_ptr<CLiteral> literal) : CErrorLexer(literal)
+{
+}
+
+std::string CErrorLexerUnknownLiteral::toString()
+{
+	return "CLexer [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Unknown literal.";
+}
+
+CErrorLexerUnmatchedStringQuotes::CErrorLexerUnmatchedStringQuotes(std::shared_ptr<CLiteral> literal) : CErrorLexer(literal)
+{
+}
+
+std::string CErrorLexerUnmatchedStringQuotes::toString()
+{
+	return "CLexer [" + std::to_string(this->GetErrorLine()) + ":" + std::to_string(this->GetErrorPos()) + "] Unmatched string quotes.";
 }

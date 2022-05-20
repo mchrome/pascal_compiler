@@ -3,22 +3,22 @@ program gcd;
 type 
 	Bptr = boolean;
 
-var a,b,c:integer;
-	inpt: string;
+var a,b,c, t:integer;
+	inpt, outpt: string;
 	d: Bptr;
 	e: boolean;
-	a,f,h: real;
-	inpt:string;
+	f,h: real;
+
 
 {
-	function to find greatest common divisor
+	this is a comment
 }
 
 
 function GCD(m,n:integer):integer;
 
 	type 
-		Noob = boolean;
+		w = boolean;
 
 	var ee:integer;
 
@@ -26,7 +26,7 @@ function GCD(m,n:integer):integer;
 	function FFFF(m,n:integer):integer;
 
 		type 
-			Noob1 = boolean;
+			w1 = boolean;
 
 		var ee1:integer;
 
@@ -53,16 +53,18 @@ begin
 
 
 	
-	a := (a+b)*c - d/ ( 312 + 40);
-	if a = 30 and b >= 15 or c <= 17 xor t <> 20 and not 12 then
-	begin
-		outpt := 'Fine';
-	end;
+	a := (a+b)*c - d/ ( GCD(64,18));
 
-	case a = 30 of
+	if (a = 30) and (b >= 15) or (c <= 17) xor (t <> 20) and not false then outpt := 'Fine';
+
+	case a = 30  of
 		1 : outpt := 'Fine';
 		2: outpt := 'Fine';
-		3: outpt := 'Fine';
+	end;
+
+	case a  of
+		'one' : f := 1;
+		'two': f := 2;
 	end;
 
 end.

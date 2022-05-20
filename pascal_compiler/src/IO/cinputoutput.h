@@ -12,7 +12,7 @@ private:
 
 public:
 	CInput(std::string inputFilePath);
-	std::unique_ptr<CLiteral> NextChar();
+	std::shared_ptr<CLiteral> NextChar();
 };
 
 class COutput {

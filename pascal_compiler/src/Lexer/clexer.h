@@ -16,13 +16,14 @@ private:
 	bool isDigit(char c);
 	bool isIgnored(char c);
 	char specialPrev;
-	std::unique_ptr<CToken> readDigit();
-	std::unique_ptr<CToken> readIdentifier();
-	std::unique_ptr<CToken> readString();
-	std::unique_ptr<CLiteral> curLiteral;
-	std::unique_ptr<CToken> strToKeywordToken(std::string tokenStr);
+	std::shared_ptr<CToken> readDigit();
+	std::shared_ptr<CToken> readIdentifier();
+	std::shared_ptr<CToken> readString();
+	std::shared_ptr<CLiteral> curLiteral;
+	std::shared_ptr<CToken> strToKeywordToken(std::string tokenStr);
+	std::shared_ptr<CLiteral> GetNextLiteral();
 public:
 	CLexer(CInput* _io);
 	~CLexer();
-	std::unique_ptr<CToken> NextToken();
+	std::shared_ptr<CToken> NextToken();
 };
